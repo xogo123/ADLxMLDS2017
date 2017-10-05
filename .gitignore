@@ -1,4 +1,7 @@
-./hw1/mlds_hw1_data/
+/hw1/mlds_hw1_data
+/hw1/model
+
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
