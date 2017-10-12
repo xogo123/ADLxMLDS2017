@@ -1,8 +1,11 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[44]:
 
+import preprocessing
+
+import os
 import sys
 import pickle
 import numpy as np
@@ -25,7 +28,7 @@ def init():
 init()
 
 
-# In[2]:
+# In[46]:
 
 n_user_train = 462
 n_user_test = 74
@@ -34,7 +37,7 @@ n_sen_test = 342
 
 path_data = 'data/'
 mfcc_or_fbank = 'mfcc'
-RNN_or_RCNN = 'RNN'
+model_name = 'RNN'
 
 if mfcc_or_fbank == 'mfcc' :
     dim = 39
@@ -44,11 +47,14 @@ else :
 # RNN seting
 n_RNN_seq = 3
 
-if RNN_or_RCNN == 'RNN' :
+if model_name == 'RNN' :
     n_seq = n_RNN_seq
     
 # for traingin 
 batch_size = 1024
+
+# for pred_to_ans
+size_window = 7
 
 
 # In[8]:
@@ -119,13 +125,122 @@ print (y_train_dummy.shape)
 # In[12]:
 
 model = RNN_model()
-model.fit(X_train, y_train_dummy, epochs=1, batch_size=batch_size, validation_split=0.25)
+model.fit(X_train, y_train_dummy, epochs=10, batch_size=batch_size, validation_split=0.0)
 pred = model.predict(X_test)
 
 
-# In[14]:
+# In[20]:
 
 print (pred.shape)
+
+
+# In[53]:
+
+def predict_to_ans(ary_pred) :
+    def num_to_char(ary_pred_num) :
+        map_48phone_char = pd.read_csv('{}48phone_char.map'.format(path_data), header=None, delimiter='\t')
+        dict_map_48phone_char = dict()
+        for row in map_48phone_char.iterrows() :
+            #dict_map_48char[name[1][0]] = dict_map_39char[name[1][1]]
+            dict_map_48phone_char[row[1][1]] = row[1][2]
+        flat = ary_pred_num.flatten()
+        flat_copy = flat.copy().astype(str)
+        for i,num in enumerate(flat) :
+            flat_copy[i] = dict_map_48phone_char[num]
+        ary_pred_char = flat_copy.reshape((-1,n_seq))
+        return ary_pred_char
+
+    def find_mass_row(string) :
+        dict_count = dict()
+        for item in string :
+            try :
+                dict_count[item] += 1
+            except :
+                dict_count[item] = 1
+        max_item = max(dict_count, key=dict_count.get)
+        return max_item
+    
+    def find_mass_column(ary_pred, i_data_total) :
+        dict_count = dict()
+        for i in range(n_seq) :
+            item = ary_pred[i_data_total-n_seq+1+i][n_seq-1-i]
+            try :
+                dict_count[item] += 1
+            except :
+                dict_count[item] = 1
+        max_item = max(dict_count, key=dict_count.get)
+        return max_item
+    
+    def to_str_final(string) :
+        #
+        # combine two char if they are same
+        #
+        str_final = string[0]
+        for c in string[1:] :
+            if c != str_final[-1] :
+                str_final += c
+        #
+        # cut all sil in the begining
+        #
+        if str_final[0] == 'L' :
+            str_final = str_final[1:]
+            
+        return str_final
+    
+    df_BE_test = pd.read_csv('{}data_pp/beginEnd_test.csv'.format(path_data))
+    
+    ary_pred_num = np.argmax(ary_pred, axis=2)
+    print (ary_pred_num[200:206])
+    ary_pred_char = num_to_char(ary_pred_num)
+    
+    lst_X_data = []
+    i_data_total = 0 # for loop use
+    ans = []
+    for BE in df_BE_test.iterrows() :
+        index_begin = BE[1]['index_begin']
+        index_end = BE[1]['index_end']
+        length_BE = BE[1]['length']
+        n_data = length_BE - n_seq + 1
+        assert n_data >= 1, 'n_data should bigger than 1, please do checking'
+        
+        str_temp = ''
+        str_temp_2 = ''
+        for i_data in range(n_data) :
+            dic_temp = dict()
+            if (i_data < n_seq - 1) : # don't count the begining and end sequence
+                i_data_total += 1
+                continue
+            else :
+                str_temp += str(find_mass_column(ary_pred_char, i_data_total))
+                i_data_total += 1
+        assert len(str_temp) == n_data - n_seq + 1, 'len(str_temp) != n_data - n_seq + 1, please check'
+        
+        for t in range(len(str_temp) - size_window + 1) :
+            str_temp_2 += str(find_mass_row(str_temp[t:t+size_window]))
+        assert len(str_temp_2) == len(str_temp) - size_window + 1, 'len(str_temp_2) != len(str_temp) - size_window + 1, please check'
+        
+        str_final = to_str_final(str_temp_2)
+        
+        ans += [str_final]
+        
+    print ('max_len_ans : {}'.format(max(len(x) for x in ans)))
+    
+    sample = pd.read_csv('{}sample.csv'.format(path_data))
+    assert len(sample['phone_sequence']) == len(ans), 'len(sample[\'phone_sequence\']) != len(ans), please check'
+    
+    sample['phone_sequence'] = pd.DataFrame(ans)
+    if not os.path.isdir('./ans') :
+        os.mkdir('./ans')
+    sample.to_csv('./ans/ans__{}_{}_{}.csv'.format(model_name, mfcc_or_fbank, n_seq), index=False)
+        
+    return sample
+    
+ans = predict_to_ans(pred)
+
+
+# In[52]:
+
+print (ans[:5])
 
 
 # In[ ]:
