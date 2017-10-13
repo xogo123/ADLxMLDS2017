@@ -29,7 +29,7 @@ n_sen_test = 342
 path_data = 'data/'
 model_name = 'RNN'
 mfcc_or_fbank = 'mfcc'
-n_seq = 5
+n_seq = 7
 
 if_making_beginEnd = 0
 

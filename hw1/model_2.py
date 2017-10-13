@@ -49,7 +49,7 @@ else :
     dim = 69
 
 # RNN seting
-n_RNN_seq = 5
+n_RNN_seq = 7
 
 if model_name == 'RNN' :
     n_seq = n_RNN_seq
@@ -205,6 +205,9 @@ def predict_to_ans(ary_pred) :
         #
         if str_final[0] == 'L' :
             str_final = str_final[1:]
+            
+        if str_final[-1] == 'L' :
+            str_final = str_final[:-1]
             
         return str_final
     
