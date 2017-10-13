@@ -49,7 +49,7 @@ else :
     dim = 69
 
 # RNN seting
-n_RNN_seq = 3
+n_RNN_seq = 5
 
 if model_name == 'RNN' :
     n_seq = n_RNN_seq
@@ -114,7 +114,6 @@ def RNN_model() :
 #
 # loading data
 #
-'{}data_pp/X_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq)
 X_train = np.load('{}data_pp/X_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
 y_train = np.load('{}data_pp/y_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
 X_test = np.load('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
@@ -129,7 +128,7 @@ X_test = np.load('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data, model_name, m
 
 y_train = y_train.reshape((-1))
 y_train_dummy = to_categorical(y_train, num_classes=48)
-y_train_dummy = y_train_dummy.reshape((-1,3,48))
+y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
 print (X_train.shape)
 print (y_train_dummy.shape)
 

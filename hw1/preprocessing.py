@@ -29,7 +29,7 @@ n_sen_test = 342
 path_data = 'data/'
 model_name = 'RNN'
 mfcc_or_fbank = 'mfcc'
-n_seq = 3
+n_seq = 5
 
 if_making_beginEnd = 0
 
@@ -192,11 +192,11 @@ def making_RNN_data() :
 # In[16]:
 
 #
-# reindex_axis for lab_train (note : sorting between train.ark and train.lab are different)
+# main (preprocessing)
 #
 
 # just for use
-# train_ark_no_index_col = pd.read_csv('{}mfcc/train.ark'.format(path_data), header=None, delimiter=' ')
+train_ark_no_index_col = pd.read_csv('{}mfcc/train.ark'.format(path_data), header=None, delimiter=' ')
 
 if not os.path.isfile('{}data_pp/lab_train_num.csv'.format(path_data)) :
     print ('creating lab_train_num.csv')
