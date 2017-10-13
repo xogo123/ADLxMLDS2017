@@ -41,7 +41,7 @@ n_sen_test = 342
 path_data = 'data/'
 mfcc_or_fbank = 'mfcc'
 model_name = 'RNN'
-GL = 'GRU' # GRU or LSTM #
+GL = 'GRU' # GRU or LSTM 
 
 if mfcc_or_fbank == 'mfcc' :
     dim = 39
