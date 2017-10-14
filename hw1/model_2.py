@@ -109,6 +109,54 @@ def RNN_model() :
     return model
 
 
+# In[ ]:
+
+#
+# RCNN model
+#
+def RCNN_model() :
+    dr_r = 0.5
+    I = Input(shape=((n_seq,dim))) # shape = (?,1,200,2)
+#     gru1 = GRU(32, activation='relu', dropout=0.0, return_sequences=True)(I)
+#     gru2 = GRU(32, activation='relu', dropout=0.0, return_sequences=True)(gru1)
+#     gru3 = GRU(64, activation='relu', dropout=0.0, return_sequences=True)(gru2)
+#     gru4 = GRU(64, activation='relu', dropout=0.0, return_sequences=True)(gru3)
+    
+#     gru12 = GRU(32, activation='relu', dropout=0.0, return_sequences=True, go_backwards=True)(I)
+#     gru22 = GRU(32, activation='relu', dropout=0.0, return_sequences=True, go_backwards=True)(gru12)
+#     gru32 = GRU(64, activation='relu', dropout=0.0, return_sequences=True, go_backwards=True)(gru22)
+#     gru42 = GRU(64, activation='relu', dropout=0.0, return_sequences=True, go_backwards=True)(gru32)
+    
+#     F1 = Flatten()(gru4)
+#     F2 = Flatten()(gru42)
+#     C1 = Concatenate()([F1,F2])
+#     Dr1 = Dropout(dr_r)(C1)
+
+    if GL == 'LSTM' :
+        B1 = wrappers.Bidirectional(LSTM(64, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(I)
+        B2 = wrappers.Bidirectional(LSTM(128, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(B1)
+        B3 = wrappers.Bidirectional(LSTM(128, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(B2)
+        B4 = wrappers.Bidirectional(LSTM(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B3)
+    elif GL == 'GRU' :
+        B1 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(I)
+        B2 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(B1)
+        B3 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(B2)
+        B4 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B3)
+    
+    gru100 = GRU(48, activation='softmax', dropout=0.0, return_sequences=True)(B4)
+
+    model = Model(I,gru100)
+    model.compile(#loss='mean_squared_error',
+                      loss='categorical_crossentropy',
+                      #loss='sparse_categorical_crossentropy',
+                      optimizer='rmsprop',
+                      #optimizer='adam',
+                      #optimizer='sgd',
+                      metrics=['acc']) #'mae'
+    print (model.summary())
+    return model
+
+
 # In[9]:
 
 #
@@ -140,10 +188,10 @@ if not os.path.isdir('{}model'.format(path_data)) :
 
 MCP = keras.callbacks.ModelCheckpoint('{}model/{}_{}_{}_{}.h5'.format(path_data, model_name, mfcc_or_fbank, n_seq, GL), monitor='val_acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=1)
 ES = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=3, verbose=0, mode='auto')
-RM = keras.callbacks.RemoteMonitor(root='http://localhost:12333', path='/publish/epoch/end/', field='data', headers=None)
+#RM = keras.callbacks.RemoteMonitor(root='http://localhost:12333', path='/publish/epoch/end/', field='data', headers=None)
 
 model = RNN_model()
-model.fit(X_train, y_train_dummy, epochs=50, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES,RM])
+model.fit(X_train, y_train_dummy, epochs=50, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
 
 model = load_model('{}model/{}_{}_{}_{}.h5'.format(path_data, model_name, mfcc_or_fbank, n_seq, GL))
 
