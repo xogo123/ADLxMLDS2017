@@ -26,15 +26,16 @@ n_sen_test = 342
 
 # In[12]:
 
-path_data = 'data/'
-model_name = 'RNN'
-mfcc_or_fbank = 'mfcc'
-n_seq = 7
+if __name__ == '__main__' :
+    path_data = 'data/'
+    model_name = 'RNN'
+    mfcc_or_fbank = 'mfcc'
+    n_seq = 7
 
-if_making_beginEnd = 0
+    if_making_beginEnd = 0
 
-# RNN seting
-# if_making_RNN_data = 1
+    # RNN seting
+    # if_making_RNN_data = 1
 
 
 # In[13]:
@@ -42,7 +43,7 @@ if_making_beginEnd = 0
 #
 # map 48 to char or num
 #
-def conv_48_to_char_or_num(df_lab_train,char_or_num='num') :
+def conv_48_to_char_or_num(df_lab_train,path_data,char_or_num='num') :
     path_save = '{}data_pp/'.format(path_data)
     
     map_48_39 = pd.read_csv('{}phones/48_39.map'.format(path_data), header=None, delimiter='\t')
@@ -82,7 +83,7 @@ def conv_48_to_char_or_num(df_lab_train,char_or_num='num') :
 #
 # making beginEnd_train and beginEnd_test
 #
-def making_beginEnd() :
+def making_beginEnd(path_data,mfcc_or_fbank) :
     df_train_ark = pd.read_csv('{}{}/train.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
     df_test_ark = pd.read_csv('{}{}/test.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
 
@@ -135,7 +136,7 @@ def making_beginEnd() :
 #
 # need : beginEnd_train.csv, beginEnd_test.csv
 
-def making_RNN_data() :
+def making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq) :
     df_y_train = pd.read_csv('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data))
     df_y_train_noId = df_y_train.drop('0', axis=1)
 #     print (df_y_train_noId[:3])
@@ -194,50 +195,50 @@ def making_RNN_data() :
 #
 # main (preprocessing)
 #
+def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq) :
+    # just for use
+    train_ark_no_index_col = pd.read_csv('{}mfcc/train.ark'.format(path_data), header=None, delimiter=' ')
 
-# just for use
-train_ark_no_index_col = pd.read_csv('{}mfcc/train.ark'.format(path_data), header=None, delimiter=' ')
+    if not os.path.isfile('{}data_pp/lab_train_num.csv'.format(path_data)) :
+        print ('creating lab_train_num.csv')
+        conv_48_to_char_or_num(lab_train,path_data,char_or_num='num')
 
-if not os.path.isfile('{}data_pp/lab_train_num.csv'.format(path_data)) :
-    print ('creating lab_train_num.csv')
-    conv_48_to_char_or_num(lab_train,char_or_num='num')
+    if not os.path.isfile('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data)) :
+        print ('creating lab_train_num_reindex_axis.csv')
+        lab_train_num = pd.read_csv('{}data_pp/lab_train_num.csv'.format(path_data), index_col=0)
+        lab_train_num_reindex_axis = lab_train_num.reindex_axis(train_ark_no_index_col[0], axis=0)
+        lab_train_num_reindex_axis.to_csv('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data))
 
-if not os.path.isfile('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data)) :
-    print ('creating lab_train_num_reindex_axis.csv')
-    lab_train_num = pd.read_csv('{}data_pp/lab_train_num.csv'.format(path_data), index_col=0)
-    lab_train_num_reindex_axis = lab_train_num.reindex_axis(train_ark_no_index_col[0], axis=0)
-    lab_train_num_reindex_axis.to_csv('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data))
-    
-if not os.path.isfile('{}data_pp/beginEnd_test.csv'.format(path_data)) :
-    print ('creating BE')
-    making_beginEnd()
-    
-if not os.path.isfile('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq)) :
-    print ('creating {}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
-    making_RNN_data()
+    if not os.path.isfile('{}data_pp/beginEnd_test.csv'.format(path_data)) :
+        print ('creating BE')
+        making_beginEnd(path_data,mfcc_or_fbank)
+
+    if not os.path.isfile('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq)) :
+        print ('creating {}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
+        making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq)
 
 
-print ('preprocess finished...')
-print ('show the data below : ')
+    print ('preprocess finished...')
+    print ('show the data below : ')
 
-lab_train_num = pd.read_csv('{}data_pp/lab_train_num.csv'.format(path_data))
-print ('label_train_num.csv : ')
-print (lab_train_num.head(3))
+    lab_train_num = pd.read_csv('{}data_pp/lab_train_num.csv'.format(path_data))
+    print ('label_train_num.csv : ')
+    print (lab_train_num.head(3))
 
-lab_train_num_reindex_axis = pd.read_csv('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data))
-print ('lab_train_num_reindex_axis.csv : ')
-print (lab_train_num_reindex_axis.head(5))
+    lab_train_num_reindex_axis = pd.read_csv('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data))
+    print ('lab_train_num_reindex_axis.csv : ')
+    print (lab_train_num_reindex_axis.head(5))
 
-BE_train = pd.read_csv('{}data_pp/beginEnd_train.csv'.format(path_data))
-BE_test = pd.read_csv('{}data_pp/beginEnd_test.csv'.format(path_data))
-print ('beginEnd_train.csv : ')
-print (BE_train.tail(3))
-print ('beginEnd_test.csv : ')
-print (BE_test.tail(3))
+    BE_train = pd.read_csv('{}data_pp/beginEnd_train.csv'.format(path_data))
+    BE_test = pd.read_csv('{}data_pp/beginEnd_test.csv'.format(path_data))
+    print ('beginEnd_train.csv : ')
+    print (BE_train.tail(3))
+    print ('beginEnd_test.csv : ')
+    print (BE_test.tail(3))
 
-X_test = np.load('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq))
-print ('X_test.shape :')
-print (X_test.shape)
+    X_test = np.load('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq))
+    print ('X_test.shape :')
+    print (X_test.shape)
 
 
 # In[ ]:

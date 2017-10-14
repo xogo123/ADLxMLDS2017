@@ -40,7 +40,7 @@ n_sen_test = 342
 
 path_data = 'data/'
 mfcc_or_fbank = 'mfcc'
-model_name = 'RNN'
+model_name = 'RNN' # CNN or RNN
 GL = 'GRU' # GRU or LSTM 
 
 if mfcc_or_fbank == 'mfcc' :
@@ -59,6 +59,11 @@ batch_size = 1024
 
 # for pred_to_ans
 size_window = 7
+
+
+# In[ ]:
+
+
 
 
 # In[8]:
@@ -112,9 +117,9 @@ def RNN_model() :
 # In[ ]:
 
 #
-# RCNN model
+# CNN model
 #
-def RCNN_model() :
+def CNN_model() :
     dr_r = 0.5
     I = Input(shape=((n_seq,dim))) # shape = (?,1,200,2)
 #     gru1 = GRU(32, activation='relu', dropout=0.0, return_sequences=True)(I)
@@ -157,55 +162,9 @@ def RCNN_model() :
     return model
 
 
-# In[9]:
+# In[ ]:
 
-#
-# loading data
-#
-X_train = np.load('{}data_pp/X_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
-y_train = np.load('{}data_pp/y_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
-X_test = np.load('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
-
-
-# In[10]:
-
-
-
-
-# In[11]:
-
-y_train = y_train.reshape((-1))
-y_train_dummy = to_categorical(y_train, num_classes=48)
-y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
-print (X_train.shape)
-print (y_train_dummy.shape)
-
-
-# In[12]:
-
-if not os.path.isdir('{}model'.format(path_data)) :
-    os.mkdir('{}model'.format(path_data))
-
-MCP = keras.callbacks.ModelCheckpoint('{}model/{}_{}_{}_{}.h5'.format(path_data, model_name, mfcc_or_fbank, n_seq, GL), monitor='val_acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=1)
-ES = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=3, verbose=0, mode='auto')
-#RM = keras.callbacks.RemoteMonitor(root='http://localhost:12333', path='/publish/epoch/end/', field='data', headers=None)
-
-model = RNN_model()
-model.fit(X_train, y_train_dummy, epochs=50, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
-
-model = load_model('{}model/{}_{}_{}_{}.h5'.format(path_data, model_name, mfcc_or_fbank, n_seq, GL))
-
-pred = model.predict(X_test)
-
-
-# In[20]:
-
-print (pred.shape)
-
-
-# In[53]:
-
-def predict_to_ans(ary_pred) :
+def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window) :
     def num_to_char(ary_pred_num) :
         map_48phone_char = pd.read_csv('{}48phone_char.map'.format(path_data), header=None, delimiter='\t')
         dict_map_48phone_char = dict()
@@ -303,16 +262,74 @@ def predict_to_ans(ary_pred) :
     sample['phone_sequence'] = pd.DataFrame(ans)
     if not os.path.isdir('./ans') :
         os.mkdir('./ans')
-    sample.to_csv('./ans/ans_{}_{}_{}_{}.csv'.format(model_name, mfcc_or_fbank, n_seq, GL), index=False)
+    sample.to_csv('./ans/ans_{}_{}_{}_{}_WS{}.csv'.format(model_name, mfcc_or_fbank, n_seq, GL, size_window), index=False)
         
     return sample
+
+
+# In[12]:
+
+def do_training() :
+    #
+    # loading data
+    #
+    X_train = np.load('{}data_pp/X_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
+    y_train = np.load('{}data_pp/y_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
     
-ans = predict_to_ans(pred)
+    y_train = y_train.reshape((-1))
+    y_train_dummy = to_categorical(y_train, num_classes=48)
+    y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
+    
+    if not os.path.isdir('{}model'.format(path_data)) :
+        os.mkdir('{}model'.format(path_data))
+
+    MCP = keras.callbacks.ModelCheckpoint('{}model/{}_{}_{}_{}.h5'.format(path_data, model_name, mfcc_or_fbank, n_seq, GL), monitor='val_acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=1)
+    ES = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=5, verbose=0, mode='auto')
+    #RM = keras.callbacks.RemoteMonitor(root='http://localhost:12333', path='/publish/epoch/end/', field='data', headers=None)
+
+    if model_name == 'RNN' :
+        model = RNN_model()
+    elif model_name == 'CNN' :
+        model = CNN_model()
+    model.fit(X_train, y_train_dummy, epochs=50, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
 
 
-# In[52]:
 
-print (ans[:5])
+# In[ ]:
+
+def do_testing(lst_size_window) :
+    #
+    # loading data
+    #
+    X_test = np.load('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq))
+    model = load_model('{}model/{}_{}_{}_{}.h5'.format(path_data, model_name, mfcc_or_fbank, n_seq, GL))
+
+    pred = model.predict(X_test)
+    for size_window in lst_size_window :
+        ans = predict_to_ans(pred, model_name, mfcc_or_fbank, n_seq, GL, size_window)
+        print (ans[:5])
+
+
+# In[20]:
+
+lst_size_window = [3,5,7,9,12]
+lst_n_seq = [3,5,7,9,12]
+
+for n_seq in lst_n_seq :
+    preprocessing.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq)
+    do_training()
+    do_testing(lst_size_window)
+
+
+# In[ ]:
+
+
+    
+
+
+# In[ ]:
+
+
 
 
 # In[ ]:
