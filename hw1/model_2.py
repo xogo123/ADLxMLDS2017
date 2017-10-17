@@ -49,7 +49,7 @@ else :
     dim = 69
 
 # RNN seting
-n_RNN_seq = 7
+n_RNN_seq = 33
 
 if model_name == 'RNN' :
     n_seq = n_RNN_seq
@@ -58,7 +58,7 @@ if model_name == 'RNN' :
 batch_size = 1024
 
 # for pred_to_ans
-size_window = 7
+size_window = 9
 
 
 # In[ ]:
@@ -312,8 +312,8 @@ def do_testing(lst_size_window) :
 
 # In[20]:
 
-lst_size_window = [3,5,7,9,12]
-lst_n_seq = [3,5,7,9,12]
+lst_size_window = [7]
+lst_n_seq = [15,31,45,61]
 
 for n_seq in lst_n_seq :
     preprocessing.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq)

@@ -30,7 +30,7 @@ if __name__ == '__main__' :
     path_data = 'data/'
     model_name = 'RNN'
     mfcc_or_fbank = 'mfcc'
-    n_seq = 7
+    n_seq = 15
 
     if_making_beginEnd = 0
 
@@ -196,10 +196,10 @@ def making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq) :
 # main (preprocessing)
 #
 def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq) :
-    # just for use
-    train_ark_no_index_col = pd.read_csv('{}mfcc/train.ark'.format(path_data), header=None, delimiter=' ')
+    # just for use. note just use mfcc is enough
+    train_ark_no_index_col = pd.read_csv('{}{}/train.ark'.format(path_data,MOF), header=None, delimiter=' ')
 
-    if not os.path.isfile('{}data_pp/lab_train_num.csv'.format(path_data)) :
+    if not os.path.isfile('{}data_pp/lab_train_num.csv'.format(path_data) :
         print ('creating lab_train_num.csv')
         conv_48_to_char_or_num(lab_train,path_data,char_or_num='num')
 
