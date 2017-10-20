@@ -1,13 +1,13 @@
 
 # coding: utf-8
 
-# In[9]:
+# In[1]:
 
 # require :
 # data/data_pp/lab_train_num.csv because it needs to run 1 hr
 
 
-# In[10]:
+# In[2]:
 
 import os
 import sys
@@ -16,7 +16,7 @@ import numpy as np
 import pandas as pd
 
 
-# In[11]:
+# In[3]:
 
 n_user_train = 462
 n_user_test = 74
@@ -28,9 +28,10 @@ n_sen_test = 342
 
 if __name__ == '__main__' :
     path_data = 'data/'
-    model_name = 'RNN'
+    model_name = 'CNN'
     mfcc_or_fbank = 'mfcc'
-    n_seq = 15
+    n_seq = 13
+    n_CNN_window = 3
 
     if_making_beginEnd = 0
 
@@ -190,16 +191,89 @@ def making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq) :
 #     making_RNN_data()
 
 
+# In[ ]:
+
+#
+# making RNN data 
+#
+# need : beginEnd_train.csv, beginEnd_test.csv
+
+def making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
+    df_y_train = pd.read_csv('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data))
+    df_y_train_noId = df_y_train.drop('0', axis=1)
+#     print (df_y_train_noId[:3])
+    
+    df_train_ark = pd.read_csv('{}{}/train.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
+    df_test_ark = pd.read_csv('{}{}/test.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
+    df_train_ark_noId = df_train_ark.drop(0, axis=1)
+    df_test_ark_noId = df_test_ark.drop(0, axis=1)
+#     print (df_train_ark_noId.iloc[:3])
+    
+    
+    df_beginEnd_train = pd.read_csv('{}data_pp/beginEnd_train.csv'.format(path_data))
+    df_beginEnd_test = pd.read_csv('{}data_pp/beginEnd_test.csv'.format(path_data))
+#     print (df_beginEnd_train.head(5))
+#     print (df_beginEnd_train.tail(5))
+#     print (df_beginEnd_test.head(5))
+#     print (df_beginEnd_test.tail(5))    
+    for df_BE in [df_beginEnd_train,df_beginEnd_test] :
+        if df_BE is df_beginEnd_train :
+            print ('train data is building...')
+            df_ark = df_train_ark_noId
+        elif df_BE is df_beginEnd_test :
+            print ('test data is building...')
+            df_ark = df_test_ark_noId
+            
+        lst_X_data = []
+        lst_y_data = []
+        
+        for BE in df_BE.iterrows() :
+            index_begin = BE[1]['index_begin']
+            index_end = BE[1]['index_end']
+            length_BE = BE[1]['length']
+            n_data = length_BE - n_seq + 1 - n_CNN_window + 1
+            assert n_data >= 1, 'n_data should bigger than 1, please do checking'
+            
+            for i in range(n_data) :
+                lst_lst_X_data = []
+                lst_lst_y_data = []
+                for i2 in range(n_seq) :
+                    lst_lst_X_data += [df_ark.iloc[index_begin+i+i2:index_begin+i+i2+n_CNN_window].values.tolist()]
+#                     if df_BE is df_beginEnd_train :
+#                         lst_lst_y_data += [df_y_train_noId.iloc[index_begin+i+i2:index_begin+i+i2+n_CNN_window].values.tolist()]
+
+                lst_X_data += [lst_lst_X_data]
+                
+                #
+                # notice !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+                #
+                
+                if df_BE is df_beginEnd_train :
+                    lst_y_data += [df_y_train_noId.iloc[index_begin+i+int((n_CNN_window-1)/2):index_begin+i+n_seq+int((n_CNN_window-1)/2)].values.tolist()]
+
+        if df_BE is df_beginEnd_train :
+            ary_X_data = np.array(lst_X_data)
+            np.save('{}data_pp/X_train_{}_{}_{}.npy'.format(path_data, model_name, mfcc_or_fbank, n_seq), ary_X_data)
+            ary_y_data = np.array(lst_y_data)
+            np.save('{}data_pp/y_train_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq), ary_y_data)
+        elif df_BE is df_beginEnd_test :
+            ary_X_data = np.array(lst_X_data)
+            np.save('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq), ary_X_data)
+    print ('finished making CNN data')
+# if if_making_RNN_data :
+# making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq)
+
+
 # In[16]:
 
 #
 # main (preprocessing)
 #
-def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq) :
+def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
     # just for use. note just use mfcc is enough
-    train_ark_no_index_col = pd.read_csv('{}{}/train.ark'.format(path_data,MOF), header=None, delimiter=' ')
+    train_ark_no_index_col = pd.read_csv('{}{}/train.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
 
-    if not os.path.isfile('{}data_pp/lab_train_num.csv'.format(path_data) :
+    if not os.path.isfile('{}data_pp/lab_train_num.csv'.format(path_data)) :
         print ('creating lab_train_num.csv')
         conv_48_to_char_or_num(lab_train,path_data,char_or_num='num')
 
@@ -215,7 +289,10 @@ def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq) :
 
     if not os.path.isfile('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq)) :
         print ('creating {}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
-        making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq)
+        if model_name == 'RNN' :
+            making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq)
+        elif model_name == 'CNN' :
+            making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 
 
     print ('preprocess finished...')
