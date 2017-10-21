@@ -146,10 +146,12 @@ def CNN_model() :
         B4 = wrappers.Bidirectional(LSTM(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B3)
     elif GL == 'GRU' :
         T1 = TimeDistributed(Conv2D(64,(3,1), strides=(1,1), activation='elu'))(I)
-        #T2 = TimeDistributed(MaxPooling2D(pool_size=(1, 1), strides=(1,1), padding='valid'))(T1)
-        T3 = TimeDistributed(Flatten())(T1)
-        B1 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
-        B4 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B1)
+        T2 = TimeDistributed(Conv2D(64,(1,3), strides=(1,1), activation='elu'))(T1)
+        TM1 = TimeDistributed(MaxPooling2D(pool_size=(1, 2), strides=(1,1), padding='valid'))(T2)
+        T3 = TimeDistributed(Flatten())(TM1)
+        B1 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(T3)
+        B2 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B1)
+        B4 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B2)
         
     gru100 = wrappers.Bidirectional(GRU(48, activation='softmax', dropout=0.0, return_sequences=True), merge_mode='ave')(B4)
 
@@ -309,7 +311,7 @@ def do_training() :
         model = RNN_model()
     elif model_name == 'CNN' :
         model = CNN_model()
-    model.fit(X_train, y_train_dummy, epochs=1, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
+    model.fit(X_train, y_train_dummy, epochs=200, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
 
 
 

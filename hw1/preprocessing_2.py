@@ -6,6 +6,10 @@
 # require :
 # data/data_pp/lab_train_num.csv because it needs to run 1 hr
 
+# time(sec) :
+# conv_48_to_char_or_num : 2500
+# 
+
 
 # In[2]:
 
@@ -295,7 +299,7 @@ def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
         print ('creating BE')
         making_beginEnd(path_data,mfcc_or_fbank)
 
-    if not os.path.isfile('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq)) :
+    if not os.path.isfile('./data_pp/X_train_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq)) :
         print ('creating {}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
         if model_name == 'RNN' :
             making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq)
