@@ -304,7 +304,7 @@ def do_training() :
         model = RNN_model()
     elif model_name == 'CNN' :
         model = CNN_model()
-    model.fit(X_train, y_train_dummy, epochs=200, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
+    model.fit(X_train, y_train_dummy, epochs=1, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
 
 
 
