@@ -296,22 +296,22 @@ def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 
     print ('preprocess finished...')
-    print ('show the data below : ')
+#     print ('show the data below : ')
 
     lab_train_num = pd.read_csv('{}data_pp/lab_train_num.csv'.format(path_data))
-    print ('label_train_num.csv : ')
-    print (lab_train_num.head(3))
+#     print ('label_train_num.csv : ')
+#     print (lab_train_num.head(3))
 
     lab_train_num_reindex_axis = pd.read_csv('{}data_pp/lab_train_num_reindex_axis.csv'.format(path_data))
-    print ('lab_train_num_reindex_axis.csv : ')
-    print (lab_train_num_reindex_axis.head(5))
+#     print ('lab_train_num_reindex_axis.csv : ')
+#     print (lab_train_num_reindex_axis.head(5))
 
     BE_train = pd.read_csv('{}data_pp/beginEnd_train.csv'.format(path_data))
     BE_test = pd.read_csv('{}data_pp/beginEnd_test.csv'.format(path_data))
-    print ('beginEnd_train.csv : ')
-    print (BE_train.tail(3))
-    print ('beginEnd_test.csv : ')
-    print (BE_test.tail(3))
+#     print ('beginEnd_train.csv : ')
+#     print (BE_train.tail(3))
+#     print ('beginEnd_test.csv : ')
+#     print (BE_test.tail(3))
 
     X_test = np.load('{}data_pp/X_test_{}_{}_{}.npy'.format(path_data,model_name, mfcc_or_fbank, n_seq))
     print ('X_test.shape :')
