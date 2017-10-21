@@ -1,5 +1,6 @@
 /hw1/data
 /hw1/data_pp
+/hw1/model_old
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
