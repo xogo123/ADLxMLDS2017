@@ -3,6 +3,7 @@
 
 # In[1]:
 
+
 # require :
 # data/data_pp/lab_train_num.csv because it needs to run 1 hr
 
@@ -12,6 +13,7 @@
 
 
 # In[2]:
+
 
 import time
 import os
@@ -25,6 +27,7 @@ start_time_prep = time.time()
 
 # In[3]:
 
+
 n_user_train = 462
 n_user_test = 74
 n_sen_train = 1716
@@ -32,6 +35,7 @@ n_sen_test = 342
 
 
 # In[12]:
+
 
 if __name__ == '__main__' :
     path_data = 'data/'
@@ -47,6 +51,7 @@ if __name__ == '__main__' :
 
 
 # In[13]:
+
 
 #
 # map 48 to char or num
@@ -89,6 +94,7 @@ def conv_48_to_char_or_num(df_lab_train,path_data,char_or_num='num') :
 
 
 # In[14]:
+
 
 #
 # making beginEnd_train and beginEnd_test
@@ -142,6 +148,7 @@ def making_beginEnd(path_data,mfcc_or_fbank) :
 
 
 # In[15]:
+
 
 #
 # making RNN data 
@@ -203,6 +210,7 @@ def making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq) :
 
 
 # In[ ]:
+
 
 #
 # making CNN data 
@@ -277,6 +285,7 @@ def making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 # In[16]:
 
+
 #
 # main (preprocessing)
 #
@@ -334,10 +343,12 @@ def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 # In[ ]:
 
+
 # 下面是test_only
 
 
 # In[ ]:
+
 
 #
 # making beginEnd_train and beginEnd_test
@@ -393,6 +404,7 @@ def making_beginEnd_test_only(path_data,mfcc_or_fbank) :
 
 
 # In[ ]:
+
 
 #
 # making RNN data 
@@ -451,6 +463,7 @@ def making_RNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq) :
 
 # In[ ]:
 
+
 #
 # making CNN data 
 #
@@ -471,15 +484,8 @@ def making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_win
     
 #     df_beginEnd_train = pd.read_csv('./data_pp/beginEnd_train.csv')
     df_beginEnd_test = pd.read_csv('./data_pp/beginEnd_test.csv')
-#     print (df_beginEnd_train.head(5))
-#     print (df_beginEnd_train.tail(5))
-#     print (df_beginEnd_test.head(5))
-#     print (df_beginEnd_test.tail(5))    
+    
     for df_BE in [df_beginEnd_test] :
-#         if df_BE is df_beginEnd_train :
-#             print ('train data is building...')
-#             df_ark = df_train_ark_noId
-#         elif df_BE is df_beginEnd_test :
         print ('test data is building...')
         df_ark = df_test_ark_noId
             
@@ -517,6 +523,7 @@ def making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_win
 #             np.save('./data_pp/y_train_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_y_data)
 #         elif df_BE is df_beginEnd_test :
         ary_X_data = np.array(lst_X_data)
+        print (str(time.time() - start_time_tmp))
         np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
     print ('finished making CNN data')
     print ("making_CNN_data_test_only took", str(time.time() - start_time_tmp), "to run")
@@ -525,6 +532,7 @@ def making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_win
 
 
 # In[ ]:
+
 
 #
 # main (preprocessing)
@@ -579,24 +587,4 @@ def preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_windo
 #     X_test = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
 #     print ('X_test.shape :')
 #     print (X_test.shape)
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
 

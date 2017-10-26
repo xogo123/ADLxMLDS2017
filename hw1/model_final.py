@@ -19,7 +19,7 @@ import keras
 import h5py
 
 import matplotlib
-matplotlib.use('Agg')
+#matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from keras.utils import to_categorical
@@ -40,6 +40,20 @@ def init():
 init()
 
 
+
+# In[ ]:
+
+test_only = 1
+
+if len(sys.argv) == 1 :
+    # default setting
+    path_data = 'data/'
+    str_output = 'ans.csv'
+else :
+    path_data = sys.argv[1]
+    str_output = sys.argv[2]
+
+
 # In[2]:
 
 n_user_train = 462
@@ -47,7 +61,7 @@ n_user_test = 74
 n_sen_train = 1716
 n_sen_test = 342
 
-test_only = 0
+
 
 # path_data = sys.argv[1]
 # path_output = sys.argv[2]
@@ -310,6 +324,8 @@ def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, 
     assert len(sample['phone_sequence']) == len(ans), 'len(sample[\'phone_sequence\']) != len(ans), please check'
     
     sample['phone_sequence'] = pd.DataFrame(ans)
+    if test_only :
+        sample.to_csv(str_output, index=False)
     if not os.path.isdir('./ans') :
         os.mkdir('./ans')
     sample.to_csv('./ans/ans_{}_{}_{}_{}_WS{}_{}.csv'.format(model_name, mfcc_or_fbank, n_seq, GL, size_window, k), index=False)
