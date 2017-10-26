@@ -9,7 +9,7 @@
 import time
 start_time = time.time()
 print ('strating time is {}'.format(start_time))
-import preprocessing_2
+import preprocessing
 
 import os
 import sys
@@ -20,7 +20,7 @@ import keras
 import h5py
 
 import matplotlib
-matplotlib.use('Agg')
+# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 from keras.utils import to_categorical
@@ -30,15 +30,14 @@ from keras.models import Model, Sequential
 from keras.models import load_model
 # from keras.callbacks import *
 
-import tensorflow as tf
+# import tensorflow as tf
+# def init():
+#     config = tf.ConfigProto()
+#     config.gpu_options.allow_growth = True
+#     session = tf.Session(config=config)
+#     keras.backend.tensorflow_backend.set_session(session)
 
-def init():
-    config = tf.ConfigProto()
-    config.gpu_options.allow_growth = True
-    session = tf.Session(config=config)
-    keras.backend.tensorflow_backend.set_session(session)
-
-init()
+# init()
 
 
 # In[2]:
@@ -61,34 +60,6 @@ str_output = 'ans.csv'
 # In[3]:
 
 
-n_user_train = 462
-n_user_test = 74
-n_sen_train = 1716
-n_sen_test = 342
-
-
-mfcc_or_fbank = 'mfcc'
-model_name = 'RNN' # CNN or RNN
-GL = 'GRU' # GRU or LSTM 
-
-if mfcc_or_fbank == 'mfcc' :
-    dim = 39
-else :
-    dim = 69
-
-n_seq = 33
-n_CNN_window = 3
-
-# for traingin 
-batch_size = 1024
-
-# for pred_to_ans
-size_window = 9
-
-
-# In[4]:
-
-
 def keras_log_plot(log) :
     matplotlib.rcParams.update({'font.size': 16})
     fig = plt.figure(1,figsize=(20,10))
@@ -109,7 +80,7 @@ def keras_log_plot(log) :
     return fig
 
 
-# In[5]:
+# In[4]:
 
 
 #
@@ -167,7 +138,7 @@ def RNN_model() :
     return model
 
 
-# In[6]:
+# In[5]:
 
 
 #
@@ -219,7 +190,7 @@ def CNN_model(n_CNN_window) :
     return model
 
 
-# In[7]:
+# In[6]:
 
 
 def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window, k) :
@@ -323,14 +294,11 @@ def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, 
     sample['phone_sequence'] = pd.DataFrame(ans)
     if test_only :
         sample.to_csv(str_output, index=False)
-    if not os.path.isdir('./ans') :
-        os.mkdir('./ans')
-    sample.to_csv('./ans/ans_{}_{}_{}_{}_WS{}_{}.csv'.format(model_name, mfcc_or_fbank, n_seq, GL, size_window, k), index=False)
         
     return sample
 
 
-# In[8]:
+# In[7]:
 
 
 def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
@@ -391,7 +359,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 
 
-# In[9]:
+# In[8]:
 
 
 def do_testing(lst_size_window, n_CNN_window, k) :
@@ -412,22 +380,30 @@ def do_testing(lst_size_window, n_CNN_window, k) :
         print (ans[:5])
 
 
-# In[10]:
+# In[9]:
 
 
-lst_size_window = [7]
-lst_n_seq = [9]
+lst_size_window = [7] # for pred_to_ans
 n_CNN_window = 3
+n_seq = 13
 k = 1
 
-model_name = 'RNN'
 mfcc_or_fbank = 'mfcc'
-n_seq = 9
+model_name = 'RNN' # CNN or RNN
+GL = 'GRU' # GRU or LSTM 
+
+if mfcc_or_fbank == 'mfcc' :
+    dim = 39
+else :
+    dim = 69
+
+# for traingin 
+batch_size = 1024
 
 if test_only :
-    preprocessing_2.preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+    preprocessing.preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 else :
-    preprocessing_2.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+    preprocessing.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
     k = do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 print ('do testing...')
 do_testing(lst_size_window, n_CNN_window, k)
