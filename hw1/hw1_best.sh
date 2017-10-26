@@ -1,3 +1,3 @@
 #!bin/bash
 
-python3 model_best.py $1 $2
+python model_cnn.py $1 $2
