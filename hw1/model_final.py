@@ -1,7 +1,9 @@
 
 # coding: utf-8
 
-# In[44]:
+# In[1]:
+
+#%matplotlib inline
 
 import time
 start_time = time.time()
@@ -15,6 +17,10 @@ import numpy as np
 import pandas as pd
 import keras
 import h5py
+
+import matplotlib
+matplotlib.use('Agg')
+import matplotlib.pyplot as plt
 
 from keras.utils import to_categorical
 # from keras.layers import GRU, LSTM, Dropout, Dense, Input, TimeDistributed, Activation, Flatten, Concatenate
@@ -34,7 +40,7 @@ def init():
 init()
 
 
-# In[46]:
+# In[2]:
 
 n_user_train = 462
 n_user_test = 74
@@ -73,7 +79,29 @@ size_window = 9
 
 
 
-# In[8]:
+# In[ ]:
+
+def keras_log_plot(log) :
+    matplotlib.rcParams.update({'font.size': 16})
+    fig = plt.figure(1,figsize=(20,10))
+    
+    plt.subplot(121)
+    plt.plot(log['acc'], label='train_acc')
+    plt.plot(log['val_acc'], label='val_acc')
+    plt.legend(fontsize=20)
+    plt.xlabel('epoch', fontsize=20, color='black')
+    plt.ylabel('acc', fontsize=20, color='black')
+
+    plt.subplot(122)
+    plt.plot(log['loss'], label='train_loss')
+    plt.plot(log['val_loss'], label='val_loss')
+    plt.legend(fontsize=20)
+    plt.xlabel('epoch', fontsize=20, color='black')
+    plt.ylabel('loss', fontsize=20, color='black')
+    return fig
+
+
+# In[3]:
 
 #
 # RNN model
@@ -130,28 +158,42 @@ def RNN_model() :
     return model
 
 
-# In[ ]:
+# In[4]:
 
 #
 # CNN model
 #
-def CNN_model() :
+def CNN_model(n_CNN_window) :
     dr_r = 0.5
     if mfcc_or_fbank == 'mfcc' :
-        I = Input(shape=((n_seq,n_CNN_window,int(dim/3),3))) # shape = (?,1,200,2)
+        I = Input(shape=((n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))) # shape = (?,1,200,2)
     if GL == 'LSTM' :
         B1 = wrappers.Bidirectional(LSTM(64, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(I)
         B2 = wrappers.Bidirectional(LSTM(128, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(B1)
         B3 = wrappers.Bidirectional(LSTM(128, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(B2)
         B4 = wrappers.Bidirectional(LSTM(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B3)
     elif GL == 'GRU' :
-        T1 = TimeDistributed(Conv2D(64,(3,1), strides=(1,1), activation='elu'))(I)
-        T2 = TimeDistributed(Conv2D(64,(1,3), strides=(1,1), activation='elu'))(T1)
-        TM1 = TimeDistributed(MaxPooling2D(pool_size=(1, 2), strides=(1,1), padding='valid'))(T2)
-        T3 = TimeDistributed(Flatten())(TM1)
-        B1 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(T3)
-        B2 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B1)
+# 7
+        T1 = TimeDistributed(Conv2D(32,(3,1), strides=(1,1), activation='elu'))(I)
+        #T2 = TimeDistributed(Conv2D(64,(1,3), strides=(1,1), activation='elu'))(T1)
+        #TM1 = TimeDistributed(MaxPooling2D(pool_size=(1,2), strides=(1,1), padding='valid'))(T2)
+        T3 = TimeDistributed(Flatten())(T1)
+        #B1 = wrappers.Bidirectional(GRU(32, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(T3)
+        B2 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
         B4 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B2)
+# 5
+#         T1 = TimeDistributed(Conv2D(32,(3,1), strides=(1,1), activation='elu'))(I)
+#         T2 = TimeDistributed(Conv2D(32,(1,3), strides=(1,1), activation='elu'))(T1)
+#         T3 = TimeDistributed(Flatten())(T2)
+#         B2 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
+#         B4 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B2)
+
+# 6        
+#         #T1 = TimeDistributed(Conv2D(16,(3,2), strides=(1,1), activation='elu'))(I)
+#         T1 = TimeDistributed(Conv2D(128,(3,1), strides=(1,1), activation='elu'))(I)
+#         T3 = TimeDistributed(Flatten())(T1)
+#         B2 = wrappers.Bidirectional(GRU(32, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
+#         B4 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B2)
         
     gru100 = wrappers.Bidirectional(GRU(48, activation='softmax', dropout=0.0, return_sequences=True), merge_mode='ave')(B4)
 
@@ -167,9 +209,9 @@ def CNN_model() :
     return model
 
 
-# In[ ]:
+# In[5]:
 
-def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window) :
+def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window, k) :
     def num_to_char(ary_pred_num) :
         map_48phone_char = pd.read_csv('{}48phone_char.map'.format(path_data), header=None, delimiter='\t')
         dict_map_48phone_char = dict()
@@ -270,14 +312,14 @@ def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, 
     sample['phone_sequence'] = pd.DataFrame(ans)
     if not os.path.isdir('./ans') :
         os.mkdir('./ans')
-    sample.to_csv('./ans/ans_{}_{}_{}_{}_WS{}.csv'.format(model_name, mfcc_or_fbank, n_seq, GL, size_window), index=False)
+    sample.to_csv('./ans/ans_{}_{}_{}_{}_WS{}_{}.csv'.format(model_name, mfcc_or_fbank, n_seq, GL, size_window, k), index=False)
         
     return sample
 
 
-# In[12]:
+# In[9]:
 
-def do_training() :
+def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
     #
     # loading data
     #
@@ -291,7 +333,7 @@ def do_training() :
         y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
     
     if model_name == 'CNN' :
-        X_train = X_train.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
+        X_train = X_train.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
         y_train = y_train.reshape((-1,n_seq,n_CNN_window))
         y_train_dummy = to_categorical(y_train, num_classes=48)
         y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
@@ -303,42 +345,64 @@ def do_training() :
     if not os.path.isdir('./model') :
         os.mkdir('./model')
 
-    MCP = keras.callbacks.ModelCheckpoint('./model/{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL), monitor='val_acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=1)
-    ES = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=20, verbose=0, mode='auto')
+    k = 1
+    while(1) :
+        if not os.path.isfile('./model/{}_{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL, k)) :
+            break
+        k += 1
+    MCP = keras.callbacks.ModelCheckpoint('./model/{}_{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL, k), monitor='val_acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=1)
+    ES = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=5, verbose=0, mode='auto')
     #RM = keras.callbacks.RemoteMonitor(root='http://localhost:12333', path='/publish/epoch/end/', field='data', headers=None)
 
     if model_name == 'RNN' :
         model = RNN_model()
     elif model_name == 'CNN' :
-        model = CNN_model()
-    model.fit(X_train, y_train_dummy, epochs=200, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
+        model = CNN_model(n_CNN_window)
+    log = model.fit(X_train, y_train_dummy, epochs=50, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
+    df_log = log.history
+    fig = keras_log_plot(df_log)
+#     df_history = pd.DataFrame(log.history)
+#     plot = df_history[['acc','val_acc']].plot()
+#     fig = plot.get_figure()
+    
+#     fig = plt.figure()
+#     ax = fig.add_subplot(111)
+#     ax.plot(df_history)
+    
+    if not os.path.isdir('./log_plot') :
+        os.mkdir('./log_plot')
+    fig.savefig('./log_plot/{}_{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
+    
+    return k
 
 
 
-# In[ ]:
+# In[10]:
 
-def do_testing(lst_size_window, n_CNN_window) :
+def do_testing(lst_size_window, n_CNN_window, k) :
     #
     # loading data
     #
     X_test = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
-    model = load_model('./model/{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL))
+    model = load_model('./model/{}_{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
     
     if model_name == 'CNN' :
-        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
+        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
         print ('X_test.shape : ')
         print (X_test.shape)
 
     pred = model.predict(X_test)
     for size_window in lst_size_window :
-        ans = predict_to_ans(pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window)
+        ans = predict_to_ans(pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window, k)
         print (ans[:5])
 
 
-# In[20]:
+# In[ ]:
 
 lst_size_window = [7]
-lst_n_seq = [13]
+lst_n_seq = [9]
+n_CNN_window = 3
+k = 1
 
 for n_seq in lst_n_seq :
 #     if model_name == 'RNN' :
@@ -348,8 +412,8 @@ for n_seq in lst_n_seq :
         preprocessing_2.preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
     else :
         preprocessing_2.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
-        do_training()
-    do_testing(lst_size_window, n_CNN_window)
+        k = do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+    do_testing(lst_size_window, n_CNN_window, k)
     
 print ("My program took", str(time.time() - start_time), "to run")
 
