@@ -48,7 +48,7 @@ test_only = 1
 model_plot = 0
 
 # path_data = 'data/'
-# str_output = 'ans.csv'
+# str_output = 'ans_rnn.csv'
 
 if len(sys.argv) == 1 :
     # default setting
@@ -361,7 +361,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 
 
-# In[ ]:
+# In[8]:
 
 
 def do_testing(lst_size_window, n_CNN_window, k) :
@@ -383,7 +383,7 @@ def do_testing(lst_size_window, n_CNN_window, k) :
         print (ans[:5])
 
 
-# In[8]:
+# In[9]:
 
 
 def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
@@ -400,13 +400,15 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
         print ('X_test.shape : ')
         print (X_test.shape)
 
+    print (str(time.time() - start_time))
     pred = model.predict(X_test)
+    print (str(time.time() - start_time) + 'after prediction')
     for size_window in lst_size_window :
         ans = predict_to_ans(pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window, k)
         print (ans[:5])
 
 
-# In[9]:
+# In[10]:
 
 
 lst_size_window = [7] # for pred_to_ans

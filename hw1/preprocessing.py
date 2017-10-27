@@ -22,7 +22,6 @@ import pickle
 import numpy as np
 import pandas as pd
 
-start_time_prep = time.time()
 
 
 # In[3]:
@@ -290,6 +289,7 @@ def making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 # main (preprocessing)
 #
 def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
+    start_time_prep = time.time()
     # just for use. note just use mfcc is enough
     train_ark_no_index_col = pd.read_csv('{}{}/train.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
     
@@ -454,7 +454,7 @@ def making_RNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq) :
 #             np.save('./data_pp/y_train_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_y_data)
 #         elif df_BE is df_beginEnd_test :
         ary_X_data = np.array(lst_X_data)
-        np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
+#         np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
     print ('finished making RNN data')
     print ("making_RNN_data_test_only took", str(time.time() - start_time_tmp), "to run")
     return ary_X_data
@@ -524,9 +524,9 @@ def making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_win
 #             np.save('./data_pp/y_train_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_y_data)
 #         elif df_BE is df_beginEnd_test :
         ary_X_data = np.array(lst_X_data)
-        print (str(time.time() - start_time_tmp))
-        np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
-        print (str(time.time() - start_time_tmp))
+#         print (str(time.time() - start_time_tmp))
+#         np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
+#         print (str(time.time() - start_time_tmp))
     print ('finished making CNN data')
     print ("making_CNN_data_test_only took", str(time.time() - start_time_tmp), "to run")
     return ary_X_data
@@ -541,6 +541,7 @@ def making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_win
 # main (preprocessing)
 #
 def preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
+    start_time_prep = time.time()
 #     # just for use. note just use mfcc is enough
 #     train_ark_no_index_col = pd.read_csv('{}{}/train.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
     
@@ -568,10 +569,10 @@ def preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_windo
         elif model_name == 'CNN' :
             ary_X_data = making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
     else :
-        print ('preprocess finished...')
-        return 0
+        ary_X_data = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
 
 
+    print ('preprocessing costs {}'.format(str(time.time()-start_time_prep)))
     print ('preprocess finished...')
     return ary_X_data
 #     print ('show the data below : ')

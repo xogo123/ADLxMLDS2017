@@ -362,7 +362,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 
 
-# In[ ]:
+# In[8]:
 
 
 def do_testing(lst_size_window, n_CNN_window, k) :
@@ -384,7 +384,7 @@ def do_testing(lst_size_window, n_CNN_window, k) :
         print (ans[:5])
 
 
-# In[8]:
+# In[9]:
 
 
 def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
@@ -407,7 +407,7 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
         print (ans[:5])
 
 
-# In[9]:
+# In[10]:
 
 
 lst_size_window = [7] # for pred_to_ans
