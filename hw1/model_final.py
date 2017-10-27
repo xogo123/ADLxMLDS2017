@@ -46,7 +46,7 @@ init()
 # In[ ]:
 
 
-test_only = 0
+test_only = 1
 
 # if len(sys.argv) == 1 :
 #     # default setting
@@ -450,7 +450,7 @@ def do_testing(X_test, lst_size_window, n_CNN_window, k) :
 lst_size_window = [7]
 lst_n_seq = [13]
 n_CNN_window = 3
-k = 1
+k = 3
 
 for n_seq in lst_n_seq :
 #     if model_name == 'RNN' :
