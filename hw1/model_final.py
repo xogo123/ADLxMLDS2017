@@ -3,6 +3,7 @@
 
 # In[1]:
 
+
 #%matplotlib inline
 
 import time
@@ -43,6 +44,7 @@ init()
 
 # In[ ]:
 
+
 test_only = 1
 
 if len(sys.argv) == 1 :
@@ -55,6 +57,7 @@ else :
 
 
 # In[2]:
+
 
 n_user_train = 462
 n_user_test = 74
@@ -91,10 +94,6 @@ size_window = 9
 # In[ ]:
 
 
-
-
-# In[ ]:
-
 def keras_log_plot(log) :
     matplotlib.rcParams.update({'font.size': 16})
     fig = plt.figure(1,figsize=(20,10))
@@ -116,6 +115,7 @@ def keras_log_plot(log) :
 
 
 # In[3]:
+
 
 #
 # RNN model
@@ -174,6 +174,7 @@ def RNN_model() :
 
 # In[4]:
 
+
 #
 # CNN model
 #
@@ -224,6 +225,7 @@ def CNN_model(n_CNN_window) :
 
 
 # In[5]:
+
 
 def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window, k) :
     def num_to_char(ary_pred_num) :
@@ -335,6 +337,7 @@ def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, 
 
 # In[9]:
 
+
 def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
     #
     # loading data
@@ -395,6 +398,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 # In[10]:
 
+
 def do_testing(lst_size_window, n_CNN_window, k) :
     #
     # loading data
@@ -415,8 +419,9 @@ def do_testing(lst_size_window, n_CNN_window, k) :
 
 # In[ ]:
 
+
 lst_size_window = [7]
-lst_n_seq = [9]
+lst_n_seq = [13]
 n_CNN_window = 3
 k = 1
 
@@ -437,15 +442,6 @@ print ("My program took", str(time.time() - start_time), "to run")
 # In[ ]:
 
 
+
     
-
-
-# In[ ]:
-
-
-
-
-# In[ ]:
-
-
 
