@@ -16,12 +16,15 @@ import sys
 import pickle
 import numpy as np
 import pandas as pd
-import keras
-import h5py
 
 import matplotlib
 #matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
+import keras
+import h5py
+
+
 
 from keras.utils import to_categorical
 # from keras.layers import GRU, LSTM, Dropout, Dense, Input, TimeDistributed, Activation, Flatten, Concatenate
@@ -47,6 +50,7 @@ init()
 
 
 test_only = 1
+plot
 sh = 0
 
 if sh :
@@ -406,7 +410,8 @@ def do_testing(lst_size_window, n_CNN_window, k) :
     #
     X_test = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
     model = load_model('./model/{}_{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
-    plot_model(model, to_file='./model/{}_{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
+    if plot :
+        plot_model(model, to_file='./model/{}_{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
     
     if model_name == 'CNN' :
         X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
@@ -428,7 +433,8 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
     #
 #     X_test = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
     model = load_model('./model/{}_{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
-    plot_model(model, to_file='./model/{}_{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
+    if plot :
+        plot_model(model, to_file='./model/{}_{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
     
     if model_name == 'CNN' :
         X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
