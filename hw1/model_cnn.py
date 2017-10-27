@@ -410,7 +410,7 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
 
 lst_size_window = [7] # for pred_to_ans
 n_CNN_window = 3
-n_seq = 13
+n_seq = 9
 k = 1
 
 mfcc_or_fbank = 'mfcc'
