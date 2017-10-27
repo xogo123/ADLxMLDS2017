@@ -45,16 +45,16 @@ from keras.models import load_model
 
 test_only = 1
 
-path_data = 'data/'
-str_output = 'ans.csv'
+# path_data = 'data/'
+# str_output = 'ans.csv'
 
-# if len(sys.argv) == 1 :
-#     # default setting
-#     path_data = 'data/'
-#     str_output = 'ans.csv'
-# else :
-#     path_data = sys.argv[1]
-#     str_output = sys.argv[2]
+if len(sys.argv) == 1 :
+    # default setting
+    path_data = 'data/'
+    str_output = 'ans_rnn.csv'
+else :
+    path_data = sys.argv[1]
+    str_output = sys.argv[2]
 
 
 # In[3]:

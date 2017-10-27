@@ -45,16 +45,16 @@ from keras.models import load_model
 
 test_only = 1
 
-path_data = 'data/'
-str_output = 'ans.csv'
+# path_data = 'data/'
+# str_output = 'ans.csv'
 
-# if len(sys.argv) == 1 :
-#     # default setting
-#     path_data = 'data/'
-#     str_output = 'ans.csv'
-# else :
-#     path_data = sys.argv[1]
-#     str_output = sys.argv[2]
+if len(sys.argv) == 1 :
+    # default setting
+    path_data = 'data/'
+    str_output = 'ans_cnn.csv'
+else :
+    path_data = sys.argv[1]
+    str_output = sys.argv[2]
 
 
 # In[3]:
@@ -385,7 +385,7 @@ def do_testing(lst_size_window, n_CNN_window, k) :
 
 lst_size_window = [7] # for pred_to_ans
 n_CNN_window = 3
-n_seq = 9
+n_seq = 13
 k = 1
 
 mfcc_or_fbank = 'mfcc'
