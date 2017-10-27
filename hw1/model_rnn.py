@@ -45,6 +45,7 @@ from keras.utils import plot_model
 
 
 test_only = 1
+model_plot = 0
 
 # path_data = 'data/'
 # str_output = 'ans.csv'
@@ -391,7 +392,8 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
     #
     #X_test = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
     model = load_model('./model/{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL))
-    plot_model(model, to_file='./model/{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL))
+    if model_plot :
+        plot_model(model, to_file='./model/{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL))
     
     if model_name == 'CNN' :
         X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
