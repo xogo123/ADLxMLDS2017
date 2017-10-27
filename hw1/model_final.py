@@ -48,13 +48,13 @@ init()
 
 test_only = 0
 
-if len(sys.argv) == 1 :
-    # default setting
-    path_data = 'data/'
-    str_output = 'ans.csv'
-else :
-    path_data = sys.argv[1]
-    str_output = sys.argv[2]
+# if len(sys.argv) == 1 :
+#     # default setting
+#     path_data = 'data/'
+#     str_output = 'ans.csv'
+# else :
+#     path_data = sys.argv[1]
+#     str_output = sys.argv[2]
 
 
 # In[2]:
@@ -191,12 +191,14 @@ def CNN_model(n_CNN_window) :
     elif GL == 'GRU' :
 # 7
         T1 = TimeDistributed(Conv2D(32,(3,1), strides=(1,1), activation='elu'))(I)
+        TB1 = TimeDistributed(BatchNormalization())(T1)
         #T2 = TimeDistributed(Conv2D(64,(1,3), strides=(1,1), activation='elu'))(T1)
         #TM1 = TimeDistributed(MaxPooling2D(pool_size=(1,2), strides=(1,1), padding='valid'))(T2)
-        T3 = TimeDistributed(Flatten())(T1)
+        T3 = TimeDistributed(Flatten())(TB1)
         #B1 = wrappers.Bidirectional(GRU(32, activation='elu', dropout=0.0, return_sequences=True), merge_mode='concat', weights=None)(T3)
         B2 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
-        B4 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B2)
+        TB2 = TimeDistributed(BatchNormalization())(B2)
+        B4 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(TB2)
 # 5
 #         T1 = TimeDistributed(Conv2D(32,(3,1), strides=(1,1), activation='elu'))(I)
 #         T2 = TimeDistributed(Conv2D(32,(1,3), strides=(1,1), activation='elu'))(T1)
@@ -217,8 +219,8 @@ def CNN_model(n_CNN_window) :
     model.compile(#loss='mean_squared_error',
                       loss='categorical_crossentropy',
                       #loss='sparse_categorical_crossentropy',
-                      optimizer='rmsprop',
-                      #optimizer='adam',
+                      #optimizer='rmsprop',
+                      optimizer='adam',
                       #optimizer='sgd',
                       metrics=['acc']) #'mae'
     print (model.summary())
