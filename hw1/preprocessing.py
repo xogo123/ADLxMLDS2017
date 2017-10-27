@@ -457,6 +457,7 @@ def making_RNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq) :
         np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
     print ('finished making RNN data')
     print ("making_RNN_data_test_only took", str(time.time() - start_time_tmp), "to run")
+    return ary_X_data
 # if if_making_RNN_data :
 #     making_RNN_data()
 
@@ -528,6 +529,7 @@ def making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_win
         print (str(time.time() - start_time_tmp))
     print ('finished making CNN data')
     print ("making_CNN_data_test_only took", str(time.time() - start_time_tmp), "to run")
+    return ary_X_data
 # if if_making_RNN_data :
 # making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq)
 
@@ -562,12 +564,13 @@ def preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_windo
     if not os.path.isfile('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq)) :
         print ('creating {}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
         if model_name == 'RNN' :
-            making_RNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq)
+            ary_X_data = making_RNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq)
         elif model_name == 'CNN' :
-            making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+            ary_X_data = making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 
 
     print ('preprocess finished...')
+    return ary_X_data
 #     print ('show the data below : ')
 
 #     lab_train_num = pd.read_csv('./data_pp/lab_train_num.csv')

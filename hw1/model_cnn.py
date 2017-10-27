@@ -29,6 +29,8 @@ from keras.layers import *
 from keras.models import Model, Sequential
 from keras.models import load_model
 # from keras.callbacks import *
+from keras.utils import plot_model
+
 
 # import tensorflow as tf
 # def init():
@@ -362,12 +364,13 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 # In[8]:
 
 
-def do_testing(lst_size_window, n_CNN_window, k) :
+def do_testing(X_test, lst_size_window, n_CNN_window, k) :
     #
     # loading data
     #
-    X_test = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
+    #X_test = np.load('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq))
     model = load_model('./model/{}_{}_{}_{}.h5'.format(model_name, mfcc_or_fbank, n_seq, GL))
+    plot_model(model, to_file='./model/{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL)')
     
     if model_name == 'CNN' :
         X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
@@ -401,12 +404,12 @@ else :
 batch_size = 1024
 
 if test_only :
-    preprocessing.preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+    X_test = preprocessing.preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 else :
     preprocessing.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
     k = do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 print ('do testing...')
-do_testing(lst_size_window, n_CNN_window, k)
+do_testing(X_test, lst_size_window, n_CNN_window, k)
     
 print ("My program took", str(time.time() - start_time), "to run")
 
