@@ -6,6 +6,8 @@
 
 #%matplotlib inline
 
+# 注意若用3.6 所有的import要在import tensorflow 之前
+
 import time
 start_time = time.time()
 print ('strating time is {}'.format(start_time))
@@ -50,7 +52,7 @@ init()
 # In[ ]:
 
 
-test_only = 1
+test_only = 0
 plot = 1
 sh = 0
 
