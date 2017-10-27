@@ -567,6 +567,9 @@ def preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_windo
             ary_X_data = making_RNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq)
         elif model_name == 'CNN' :
             ary_X_data = making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+    else :
+        print ('preprocess finished...')
+        return 0
 
 
     print ('preprocess finished...')
