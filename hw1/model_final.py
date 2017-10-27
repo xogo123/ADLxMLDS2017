@@ -9,7 +9,7 @@
 import time
 start_time = time.time()
 print ('strating time is {}'.format(start_time))
-import preprocessing_2
+import preprocessing
 
 import os
 import sys
@@ -430,9 +430,9 @@ for n_seq in lst_n_seq :
 #         preprocessing.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 #     elif model_name == 'CNN' :
     if test_only :
-        preprocessing_2.preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+        preprocessing.preprocessing_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
     else :
-        preprocessing_2.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
+        preprocessing.preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
         k = do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
     do_testing(lst_size_window, n_CNN_window, k)
     
