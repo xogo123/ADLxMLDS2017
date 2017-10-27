@@ -47,17 +47,19 @@ init()
 
 
 test_only = 1
+sh = 0
 
-path_data = 'data/'
-str_output = 'ans.csv'
-
-# if len(sys.argv) == 1 :
-#     # default setting
-#     path_data = 'data/'
-#     str_output = 'ans.csv'
-# else :
-#     path_data = sys.argv[1]
-#     str_output = sys.argv[2]
+if sh :
+    if len(sys.argv) == 1 :
+        # default setting
+        path_data = 'data/'
+        str_output = 'ans.csv'
+    else :
+        path_data = sys.argv[1]
+        str_output = sys.argv[2]
+else :
+    path_data = 'data/'
+    str_output = 'ans.csv'
 
 
 # In[2]:
@@ -67,14 +69,6 @@ n_user_train = 462
 n_user_test = 74
 n_sen_train = 1716
 n_sen_test = 342
-
-
-
-# path_data = sys.argv[1]
-# path_output = sys.argv[2]
-
-path_data = 'data/'
-# path_output = 
 
 mfcc_or_fbank = 'mfcc'
 model_name = 'CNN' # CNN or RNN
@@ -359,7 +353,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
         y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
     
     if model_name == 'CNN' :
-        X_train = X_train.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
+        X_train = X_train.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
         y_train = y_train.reshape((-1,n_seq,n_CNN_window))
         y_train_dummy = to_categorical(y_train, num_classes=48)
         y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
@@ -415,7 +409,7 @@ def do_testing(lst_size_window, n_CNN_window, k) :
     plot_model(model, to_file='./model/{}_{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
     
     if model_name == 'CNN' :
-        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
+        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
         print ('X_test.shape : ')
         print (X_test.shape)
 
@@ -437,7 +431,7 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
     plot_model(model, to_file='./model/{}_{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL, k))
     
     if model_name == 'CNN' :
-        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
+        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
         print ('X_test.shape : ')
         print (X_test.shape)
 

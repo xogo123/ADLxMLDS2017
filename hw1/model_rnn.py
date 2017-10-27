@@ -317,7 +317,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
         y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
     
     if model_name == 'CNN' :
-        X_train = X_train.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
+        X_train = X_train.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
         y_train = y_train.reshape((-1,n_seq,n_CNN_window))
         y_train_dummy = to_categorical(y_train, num_classes=48)
         y_train_dummy = y_train_dummy.reshape((-1,n_seq,48))
@@ -373,7 +373,7 @@ def do_testing(lst_size_window, n_CNN_window, k) :
     plot_model(model, to_file='./model/{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL))
     
     if model_name == 'CNN' :
-        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
+        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
         print ('X_test.shape : ')
         print (X_test.shape)
 
@@ -396,7 +396,7 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
         plot_model(model, to_file='./model/{}_{}_{}_{}.png'.format(model_name, mfcc_or_fbank, n_seq, GL))
     
     if model_name == 'CNN' :
-        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/n_CNN_window),n_CNN_window))
+        X_test = X_test.reshape((-1,n_seq,n_CNN_window,int(dim/3),3))
         print ('X_test.shape : ')
         print (X_test.shape)
 
