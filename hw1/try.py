@@ -16,7 +16,7 @@ model = load_model('./model/best.h5')
 print (model.summary())
 
 
-# In[41]:
+# In[4]:
 
 
 import pandas as pd
@@ -24,7 +24,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib
 log = pd.DataFrame(np.arange(15)[::-1].reshape((3,5)))
-print (a[[0,3]])
+print (log[[0,3]])
 
 matplotlib.rcParams.update({'font.size': 16})
 fig = plt.figure(1,figsize=(20,10))

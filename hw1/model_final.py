@@ -48,6 +48,9 @@ init()
 
 test_only = 1
 
+path_data = 'data/'
+str_output = 'ans.csv'
+
 # if len(sys.argv) == 1 :
 #     # default setting
 #     path_data = 'data/'
