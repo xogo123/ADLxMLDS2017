@@ -425,7 +425,7 @@ def do_testing(lst_size_window, n_CNN_window, k) :
 # In[ ]:
 
 
-def do_testing(X_test, lst_size_window, n_CNN_window, k) :
+def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
     #
     # loading data
     #

@@ -3,6 +3,7 @@
 
 # In[3]:
 
+
 import keras
 from keras.models import load_model
 
@@ -16,6 +17,7 @@ print (model.summary())
 
 
 # In[41]:
+
 
 import pandas as pd
 import numpy as np
@@ -45,6 +47,30 @@ fig.savefig('./111.png')
 
 # In[ ]:
 
+
+# def keras_log_plot(log) :
+#     matplotlib.rcParams.update({'font.size': 16})
+#     fig = plt.figure(1,figsize=(20,10))
+    
+#     plt.subplot(121)
+#     plt.plot(log['acc'], label='train_acc')
+#     plt.plot(log['val_acc'], label='val_acc')
+#     plt.legend(fontsize=20)
+#     plt.xlabel('epoch', fontsize=20, color='black')
+#     plt.ylabel('acc', fontsize=20, color='black')
+
+#     plt.subplot(122)
+#     plt.plot(log['loss'], label='train_loss')
+#     plt.plot(log['val_loss'], label='val_loss')
+#     plt.legend(fontsize=20)
+#     plt.xlabel('epoch', fontsize=20, color='black')
+#     plt.ylabel('loss', fontsize=20, color='black')
+#     return fig
+
+
+# In[2]:
+
+
 def keras_log_plot(log) :
     matplotlib.rcParams.update({'font.size': 16})
     fig = plt.figure(1,figsize=(20,10))
@@ -63,4 +89,13 @@ def keras_log_plot(log) :
     plt.xlabel('epoch', fontsize=20, color='black')
     plt.ylabel('loss', fontsize=20, color='black')
     return fig
+
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+import matplotlib
+
+df_log = pd.DataFrame(np.arange(15)[::-1].reshape((3,5)))
+print (df_log[[0,3]])
+fig = keras_log_plot(df_log)
 
