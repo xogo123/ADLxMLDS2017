@@ -1,1 +1,1 @@
-RNN+CNN model 由於sequence_length=13時有較好的結果，但因為擔心助教電腦無法在10分鐘內跑完前處理，因此上傳的版本為sequence_length=7的版本
+RNN+CNN model 由於sequence_length=13時有較好的結果，但因為擔心助教電腦無法在10分鐘內跑完前處理，因此上傳的版本為sequence_length=9的版本
