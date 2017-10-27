@@ -45,7 +45,7 @@ init()
 # In[ ]:
 
 
-test_only = 1
+test_only = 0
 
 if len(sys.argv) == 1 :
     # default setting
