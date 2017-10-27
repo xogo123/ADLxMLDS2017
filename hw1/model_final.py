@@ -50,7 +50,7 @@ init()
 
 
 test_only = 1
-plot
+plot = 1
 sh = 0
 
 if sh :
