@@ -288,7 +288,7 @@ def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, 
         
     print ('max_len_ans : {}'.format(max(len(x) for x in ans)))
     
-    sample = pd.read_csv('{}sample.csv'.format(path_data))
+    sample = pd.read_csv('./sample.csv')
     assert len(sample['phone_sequence']) == len(ans), 'len(sample[\'phone_sequence\']) != len(ans), please check'
     
     sample['phone_sequence'] = pd.DataFrame(ans)
