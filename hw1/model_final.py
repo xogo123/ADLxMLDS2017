@@ -199,6 +199,7 @@ def CNN_model(n_CNN_window) :
         B2 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
         TB2 = TimeDistributed(BatchNormalization())(B2)
         B4 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(TB2)
+        TB3 = TimeDistributed(BatchNormalization())(B4)
 # 5
 #         T1 = TimeDistributed(Conv2D(32,(3,1), strides=(1,1), activation='elu'))(I)
 #         T2 = TimeDistributed(Conv2D(32,(1,3), strides=(1,1), activation='elu'))(T1)
@@ -213,7 +214,7 @@ def CNN_model(n_CNN_window) :
 #         B2 = wrappers.Bidirectional(GRU(32, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
 #         B4 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B2)
         
-    gru100 = wrappers.Bidirectional(GRU(48, activation='softmax', dropout=0.0, return_sequences=True), merge_mode='ave')(B4)
+    gru100 = wrappers.Bidirectional(GRU(48, activation='softmax', dropout=0.0, return_sequences=True), merge_mode='ave')(TB3)
 
     model = Model(I,gru100)
     model.compile(#loss='mean_squared_error',
