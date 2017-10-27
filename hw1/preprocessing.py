@@ -525,6 +525,7 @@ def making_CNN_data_test_only(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_win
         ary_X_data = np.array(lst_X_data)
         print (str(time.time() - start_time_tmp))
         np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
+        print (str(time.time() - start_time_tmp))
     print ('finished making CNN data')
     print ("making_CNN_data_test_only took", str(time.time() - start_time_tmp), "to run")
 # if if_making_RNN_data :
