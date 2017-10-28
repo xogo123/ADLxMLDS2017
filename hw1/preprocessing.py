@@ -56,6 +56,7 @@ if __name__ == '__main__' :
 # map 48 to char or num
 #
 def conv_48_to_char_or_num(df_lab_train,path_data,char_or_num='num') :
+    start_time_prep = time.time()
     if not os.path.isdir('./data_pp') :
         os.mkdir('./data_pp')
     
@@ -99,6 +100,7 @@ def conv_48_to_char_or_num(df_lab_train,path_data,char_or_num='num') :
 # making beginEnd_train and beginEnd_test
 #
 def making_beginEnd(path_data,mfcc_or_fbank) :
+    start_time_prep = time.time()
     df_train_ark = pd.read_csv('{}{}/train.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
     df_test_ark = pd.read_csv('{}{}/test.ark'.format(path_data,mfcc_or_fbank), header=None, delimiter=' ')
 
@@ -141,7 +143,7 @@ def making_beginEnd(path_data,mfcc_or_fbank) :
             if not os.path.isdir('./data_pp') :
                 os.mkdir('./data_pp')
             df_beginEnd_test.to_csv('./data_pp/beginEnd_test.csv', index=None)
-            
+    print ("making_beginEnd took", str(time.time() - start_time_prep), "to run")
 # if if_making_beginEnd :
 #     making_beginEnd()
 
@@ -155,6 +157,7 @@ def making_beginEnd(path_data,mfcc_or_fbank) :
 # need : beginEnd_train.csv, beginEnd_test.csv
 
 def making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq) :
+    start_time_prep = time.time()
     df_y_train = pd.read_csv('./data_pp/lab_train_num_reindex_axis.csv')
     df_y_train_noId = df_y_train.drop('0', axis=1)
 #     print (df_y_train_noId[:3])
@@ -204,6 +207,7 @@ def making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq) :
             ary_X_data = np.array(lst_X_data)
             np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
     print ('finished making RNN data')
+    print ("Making RNN data took", str(time.time() - start_time_prep), "to run")
 # if if_making_RNN_data :
 #     making_RNN_data()
 
@@ -217,6 +221,7 @@ def making_RNN_data(path_data,model_name,mfcc_or_fbank,n_seq) :
 # need : beginEnd_train.csv, beginEnd_test.csv
 
 def making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
+    start_time_prep = time.time()
     df_y_train = pd.read_csv('./data_pp/lab_train_num_reindex_axis.csv')
     df_y_train_noId = df_y_train.drop('0', axis=1)
 #     print (df_y_train_noId[:3])
@@ -278,6 +283,7 @@ def making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
             ary_X_data = np.array(lst_X_data)
             np.save('./data_pp/X_test_{}_{}_{}.npy'.format(model_name, mfcc_or_fbank, n_seq), ary_X_data)
     print ('finished making CNN data')
+    print ("Making CNN data took", str(time.time() - start_time_prep), "to run")
 # if if_making_RNN_data :
 # making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq)
 
@@ -318,7 +324,8 @@ def preprocessing(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
             making_CNN_data(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window)
 
 
-    print ('preprocess finished...')
+    print ('preprocessing finished...')
+    print ("preprocessing took", str(time.time() - start_time_prep), "to run")
 #     print ('show the data below : ')
 
 #     lab_train_num = pd.read_csv('./data_pp/lab_train_num.csv')
