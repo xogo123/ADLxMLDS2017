@@ -1,7 +1,7 @@
 
 # coding: utf-8
 
-# In[1]:
+# In[4]:
 
 
 #%matplotlib inline
@@ -20,13 +20,10 @@ import numpy as np
 import pandas as pd
 
 import matplotlib
-#matplotlib.use('Agg')
+matplotlib.use('Agg')
 import matplotlib.pyplot as plt
+
 import h5py
-
-
-
-
 
 
 from keras.utils import to_categorical
@@ -50,7 +47,7 @@ init()
 
 
 
-# In[ ]:
+# In[5]:
 
 
 test_only = 0
@@ -70,7 +67,7 @@ else :
     str_output = 'ans.csv'
 
 
-# In[2]:
+# In[6]:
 
 
 n_user_train = 462
@@ -79,7 +76,7 @@ n_sen_train = 1716
 n_sen_test = 342
 
 mfcc_or_fbank = 'mfcc'
-model_name = 'CNN' # CNN or RNN
+model_name = 'RNN' # CNN or RNN
 GL = 'GRU' # GRU or LSTM 
 
 if mfcc_or_fbank == 'mfcc' :
@@ -97,7 +94,7 @@ batch_size = 1024
 size_window = 9
 
 
-# In[ ]:
+# In[7]:
 
 
 def keras_log_plot(log) :
@@ -120,7 +117,7 @@ def keras_log_plot(log) :
     return fig
 
 
-# In[3]:
+# In[8]:
 
 
 #
@@ -178,7 +175,7 @@ def RNN_model() :
     return model
 
 
-# In[4]:
+# In[9]:
 
 
 #
@@ -204,7 +201,7 @@ def CNN_model(n_CNN_window) :
         B2 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
         TB2 = TimeDistributed(BatchNormalization())(B2)
         B4 = wrappers.Bidirectional(GRU(128, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(TB2)
-        TB3 = TimeDistributed(BatchNormalization())(B4)
+#         TB3 = TimeDistributed(BatchNormalization())(B4)
 # 5
 #         T1 = TimeDistributed(Conv2D(32,(3,1), strides=(1,1), activation='elu'))(I)
 #         T2 = TimeDistributed(Conv2D(32,(1,3), strides=(1,1), activation='elu'))(T1)
@@ -219,7 +216,7 @@ def CNN_model(n_CNN_window) :
 #         B2 = wrappers.Bidirectional(GRU(32, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(T3)
 #         B4 = wrappers.Bidirectional(GRU(64, activation='elu', dropout=dr_r, return_sequences=True), merge_mode='concat', weights=None)(B2)
         
-    gru100 = wrappers.Bidirectional(GRU(48, activation='softmax', dropout=0.0, return_sequences=True), merge_mode='ave')(TB3)
+    gru100 = wrappers.Bidirectional(GRU(48, activation='softmax', dropout=0.0, return_sequences=True), merge_mode='ave')(B4)
 
     model = Model(I,gru100)
     model.compile(#loss='mean_squared_error',
@@ -233,7 +230,7 @@ def CNN_model(n_CNN_window) :
     return model
 
 
-# In[5]:
+# In[10]:
 
 
 def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, n_CNN_window, k) :
@@ -344,7 +341,7 @@ def predict_to_ans(ary_pred, model_name, mfcc_or_fbank, n_seq, GL, size_window, 
     return sample
 
 
-# In[9]:
+# In[11]:
 
 
 def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
@@ -386,7 +383,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
         model = RNN_model()
     elif model_name == 'CNN' :
         model = CNN_model(n_CNN_window)
-    log = model.fit(X_train, y_train_dummy, epochs=50, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
+    log = model.fit(X_train, y_train_dummy, epochs=10, batch_size=batch_size, validation_split=0.1, callbacks=[MCP,ES])
     df_log = log.history
     fig = keras_log_plot(df_log)
 #     df_history = pd.DataFrame(log.history)
@@ -405,7 +402,7 @@ def do_training(path_data,model_name,mfcc_or_fbank,n_seq,n_CNN_window) :
 
 
 
-# In[10]:
+# In[12]:
 
 
 def do_testing(lst_size_window, n_CNN_window, k) :
@@ -428,7 +425,7 @@ def do_testing(lst_size_window, n_CNN_window, k) :
         print (ans[:5])
 
 
-# In[ ]:
+# In[13]:
 
 
 def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
@@ -451,13 +448,13 @@ def do_testing_test_only(X_test, lst_size_window, n_CNN_window, k) :
         print (ans[:5])
 
 
-# In[ ]:
+# In[15]:
 
 
 lst_size_window = [7]
 lst_n_seq = [13]
 n_CNN_window = 3
-k = 3
+k = 0
 
 for n_seq in lst_n_seq :
 #     if model_name == 'RNN' :
@@ -472,6 +469,7 @@ for n_seq in lst_n_seq :
         do_testing(lst_size_window, n_CNN_window, k)
     
 print ("My program took", str(time.time() - start_time), "to run")
+print ('all done')
 
 
 # In[ ]:
