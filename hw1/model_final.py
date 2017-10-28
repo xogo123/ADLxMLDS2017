@@ -24,7 +24,7 @@ import matplotlib
 import matplotlib.pyplot as plt
 import h5py
 
-import keras
+
 
 
 
@@ -37,6 +37,7 @@ from keras.models import load_model
 # from keras.callbacks import *
 from keras.utils import plot_model
 
+import keras
 import tensorflow as tf
 
 def init():
