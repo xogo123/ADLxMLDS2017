@@ -1,1 +1,15 @@
-RNN+CNN model 由於sequence_length=13時有較好的結果，但因為擔心助教電腦無法在10分鐘內跑完前處理，因此上傳的版本為sequence_length=9的版本
+requirement
+python==3.5.2
+
+tensorflow-gpu==1.3.0
+keras==2.0.7
+numpy==1.13.3
+pandas==0.20.3
+h5py==2.7.1
+graphviz==0.8.1
+matplotlib==2.1.0
+pydot==1.2.3
+
+P.S. RNN+CNN model 由於sequence_length=13時有較好的結果，但因為擔心助教電腦無法在10分鐘內跑完前處理，因此上傳的版本為sequence_length=9的版本
+
+在python3.5.2的環境上跑沒有問題，但是在python3.6.2的環境嚇跑卻會出現segmentation fault之類的問題，目前尚不知如何解決
