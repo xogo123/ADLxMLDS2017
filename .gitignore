@@ -3,6 +3,8 @@
 /hw1/model_old
 /hw1/ans/temp
 
+/hw2/MLDS_hw2_data
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
