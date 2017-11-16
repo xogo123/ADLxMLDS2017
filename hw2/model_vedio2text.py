@@ -38,12 +38,12 @@ str_output_peer_review = 'output_peer_review.txt'
 
 model_name = 's2s'
 
-max_seq = 10
+max_seq = 12
 n_caption = -1
 
-loading_model = 1
+loading_model = 0
 do_training = 1
-teacherForce = 0
+teacherForce = 1
 # after_teacherForce_train = 0
 after_teacherForce_test = 0
 
@@ -458,7 +458,7 @@ if loading_model :
         layer.set_weights(lst_layer_weights[i])
 
 if do_training :
-    log = model.fit([ary_train_EC_input, ary_train_DC_input],ary_train_DC_output, epochs=10, batch_size=128, validation_split=0., callbacks=[]) 
+    log = model.fit([ary_train_EC_input, ary_train_DC_input],ary_train_DC_output, epochs=50, batch_size=128, validation_split=0., callbacks=[]) 
     df_log = log.history
     #fig = keras_log_plot(df_log)
     
@@ -468,7 +468,7 @@ if save_model :
         os.mkdir('./model_weight')
     k = 0
     while 1 :
-        if os.path.isfile('./model_weight/lst_layer_weights_{}.pkl'.format(k)) :
+        if os.path.isfile('./model_weight/lst_layer_weights_12seq_{}.pkl'.format(k)) :
             k += 1
         else :
             break
@@ -481,7 +481,7 @@ if save_model :
 
 
 
-# In[25]:
+# In[ ]:
 
 
 ### prediction
@@ -520,7 +520,7 @@ print (df_ans)
 
 
 
-# In[15]:
+# In[ ]:
 
 
 # ary_sample_output_testset = np.loadtxt(open(path_data + "sample_output_testset.txt", "rb"), delimiter=",")
