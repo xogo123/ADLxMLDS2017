@@ -1,5 +1,5 @@
-1.avi,A man is a a the
-2.avi,A man is a a
-3.avi,A man is a a a
-4.avi,A man is a a
-5.avi,A man is a a the
+1.avi,A man is a a
+2.avi,A man is
+3.avi,A man is on a ball
+4.avi,A woman is a
+5.avi,A woman is playing the
