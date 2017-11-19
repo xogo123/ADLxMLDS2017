@@ -4,7 +4,7 @@
 /hw1/ans/temp
 
 /hw2/MLDS_hw2_data
-/hw2/model_weight
+#/hw2/model_weight
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
