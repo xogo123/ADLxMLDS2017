@@ -38,17 +38,17 @@ str_output_peer_review = 'output_peer_review.txt'
 
 model_name = 's2s'
 
-max_seq = 12
+max_seq = 10
 n_caption = -1
 
 loading_model = 0
-do_training = 1
-teacherForce = 1
+do_training = 0
+teacherForce = 0
 # after_teacherForce_train = 0
 after_teacherForce_test = 0
 
-save_model = 1
-train_data_loading = 1
+save_model = 0
+train_data_loading = 0
 test_data_loading = 1
 peer_review_data_loading = 0
 

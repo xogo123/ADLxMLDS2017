@@ -28,29 +28,34 @@ def init():
 init()
 
 
-# In[38]:
+# # parameter
+
+# In[2]:
 
 
 ### path and parameter
 path_data = './MLDS_hw2_data/'
 str_output = 'output_testset.txt'
 str_output_peer_review = 'output_peer_review.txt'
+load_model_weight_name = 'lst_layer_weights_10_28_73.pkl'
 
 model_name = 's2s'
 
-max_seq = 8
+max_seq = 10
 n_caption = -1
+only_one_caption = 0
 
 loading_model = 1
 do_training = 0
 teacherForce = 0
+attention = 0
 # after_teacherForce_train = 0
-after_teacherForce_test = 1
+after_teacherForce_test = 0
 
 save_model = 0
-train_data_loading = 1
+train_data_loading = 0
 test_data_loading = 1
-peer_review_data_loading = 0
+peer_review_data_loading = 1
 
 special_task = 0
 
@@ -59,6 +64,8 @@ special_task = 0
 #     str_output = sys.argv[2]
 #     str_output_peer_review = sys.argv[3]
 
+
+# # Classes and Functions
 
 # In[3]:
 
@@ -150,6 +157,8 @@ def Str2OneHot(sentence, n_class, dict_map, max_len_seq) :
         
 
 
+# # preprocessing
+
 # In[7]:
 
 
@@ -183,6 +192,8 @@ if train_data_loading :
             lst_train_EC_input += [lst_npy]
             lst_ary_OneHot = Str2OneHot(caption, lang.n_words, lang.word2index, lang.max_len_seq).tolist()
             lst_train_DC_output += [lst_ary_OneHot]
+            if only_one_caption :
+                break
     assert len(lst_train_EC_input) == len(lst_train_DC_output), "??"
     ary_train_EC_input = np.asarray(lst_train_EC_input).reshape(-1,80,4096)
     del lst_train_EC_input
@@ -244,6 +255,7 @@ if peer_review_data_loading :
         for i,id in enumerate(lst_id_peer_review) :
             lst_id_peer_review[i] = id.rstrip('\n')
     
+    lst_peer_review_EC_input = []
     for i, id in enumerate(lst_id_peer_review) :
         npy = np.load('{}peer_review/feat/{}.npy'.format(path_data, id))
         lst_peer_review_EC_input += [npy]
@@ -261,7 +273,7 @@ if peer_review_data_loading :
 print ('---data loading finished---')
 
 
-# In[ ]:
+# In[8]:
 
 
 # def model_pretrain(lang=lang) :
@@ -284,7 +296,7 @@ print ('---data loading finished---')
 #     return model
 
 
-# In[ ]:
+# In[9]:
 
 
 # def model_DC_only1(lang=lang) :
@@ -313,77 +325,26 @@ print ('---data loading finished---')
 #     return model
 
 
-# In[8]:
+# In[10]:
 
 
-# def model_pretrain(lang=lang) :
-#     EC_input = Input(shape=(80,4096))
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_input)
-#     EC_output = BatchNormalization()(EC_output)
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
-#     EC_output = BatchNormalization()(EC_output)
-#     EC_output, EC_output_state = GRU(64,return_state=True, activation='selu')(EC_output)
-#     EC_output_stage = BatchNormalization()(EC_output_state)
-#     DC_input = Input(shape=(None,lang.n_words))
-# #     DC_input_M = Masking(mask_value=0.0)(DC_input)
-
-#     DC_dense_1 = TimeDistributed(Dense(32))
-#     DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu')
-#     DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu')
-# #     DC_gru3 = GRU(64, return_sequences=True, return_state=True, activation='selu')
-#     DC_dense_2 = TimeDistributed(Dense(lang.n_words, activation='softmax'))
-#     Ba_output_1 = TimeDistributed(BatchNormalization())
-# #     Ba_output_2 = TimeDistributed(BatchNormalization())
-# #     Ba_output_3 = TimeDistributed(BatchNormalization())
-
-#     DC_output_state1 = EC_output_state
-#     DC_output_state2 = EC_output_state
-# #     DC_output_state3 = EC_output_state
-#     DC_output = DC_input
-# #     lst_DC_output = []
-# #     for _ in range(lang.max_len_seq) :
-#     DC_output = DC_dense_1(DC_output)
-#     DC_output = Ba_output_1(DC_output)
-#     DC_output, DC_output_state1 = DC_gru1(DC_output, initial_state=DC_output_state1)
-
-# #     DC_output = Ba_output_2(DC_output)
-
-#     DC_output, DC_output_state2 = DC_gru2(DC_output, initial_state=DC_output_state2)
-# #         DC_output, DC_output_state3 = DC_gru3(DC_output, initial_state=DC_output_state3)
-# #         DC_output = Ba_output_3(DC_output)
-#     DC_output = DC_dense_2(DC_output)
-# #     lst_DC_output += [DC_output]
-
-# #     DC_output = Lambda(lambda x: K.concatenate(x, axis=1))(lst_DC_output)
-
-#     model = Model([EC_input,DC_input],DC_output)
-#     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
-#     print (model.summary())
-#     return model
-
-
-# In[29]:
-
-
-#################### not work
 def model_pretrain(lang=lang) :
     EC_input = Input(shape=(80,4096))
-#     EC_output = BatchNormalization()(EC_input)
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
-#     EC_output = BatchNormalization()(EC_output)
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
-#     EC_output = BatchNormalization()(EC_output)
-    EC_output, EC_output_state = GRU(64,return_state=True, activation='selu', kernel_initializer='lecun_normal')(EC_input)
+    EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_input)
+    EC_output = BatchNormalization()(EC_output)
+    EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
+    EC_output = BatchNormalization()(EC_output)
+    EC_output, EC_output_state = GRU(64,return_state=True, activation='selu')(EC_output)
     EC_output_stage = BatchNormalization()(EC_output_state)
     DC_input = Input(shape=(None,lang.n_words))
 #     DC_input_M = Masking(mask_value=0.0)(DC_input)
 
-    DC_dense_1 = TimeDistributed(Dense(32, activation='selu', kernel_initializer='lecun_normal'))
-    DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu', kernel_initializer='lecun_normal')
-    DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu', kernel_initializer='lecun_normal')
+    DC_dense_1 = TimeDistributed(Dense(32))
+    DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu')
+    DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu')
 #     DC_gru3 = GRU(64, return_sequences=True, return_state=True, activation='selu')
     DC_dense_2 = TimeDistributed(Dense(lang.n_words, activation='softmax'))
-#     Ba_output_1 = TimeDistributed(BatchNormalization())
+    Ba_output_1 = TimeDistributed(BatchNormalization())
 #     Ba_output_2 = TimeDistributed(BatchNormalization())
 #     Ba_output_3 = TimeDistributed(BatchNormalization())
 
@@ -394,10 +355,12 @@ def model_pretrain(lang=lang) :
 #     lst_DC_output = []
 #     for _ in range(lang.max_len_seq) :
     DC_output = DC_dense_1(DC_output)
-#     DC_output = Ba_output_1(DC_output)
+    DC_output = Ba_output_1(DC_output)
     DC_output, DC_output_state1 = DC_gru1(DC_output, initial_state=DC_output_state1)
+
+#     DC_output = Ba_output_2(DC_output)
+
     DC_output, DC_output_state2 = DC_gru2(DC_output, initial_state=DC_output_state2)
-#         DC_output = Ba_output_2(DC_output)
 #         DC_output, DC_output_state3 = DC_gru3(DC_output, initial_state=DC_output_state3)
 #         DC_output = Ba_output_3(DC_output)
     DC_output = DC_dense_2(DC_output)
@@ -411,46 +374,48 @@ def model_pretrain(lang=lang) :
     return model
 
 
-# In[30]:
+# In[11]:
 
 
-# def model_DC_only1(lang=lang) :
+# #################### not work
+# def model_pretrain(lang=lang) :
 #     EC_input = Input(shape=(80,4096))
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_input)
-#     EC_output = BatchNormalization()(EC_output)
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
-#     EC_output = BatchNormalization()(EC_output)
-#     EC_output, EC_output_state = GRU(64,return_state=True, activation='selu')(EC_output)
+# #     EC_output = BatchNormalization()(EC_input)
+# #     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu', kernel_initializer='lecun_normal'), merge_mode='concat')(EC_input)
+# #     EC_output = BatchNormalization()(EC_output)
+# #     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
+# #     EC_output = BatchNormalization()(EC_output)
+#     EC_output, EC_output_state = GRU(64,return_state=True, activation='selu', kernel_initializer='lecun_normal')(EC_input)
 #     EC_output_stage = BatchNormalization()(EC_output_state)
-#     DC_input = Input(shape=(1,lang.n_words))
+#     DC_input = Input(shape=(None,lang.n_words))
 # #     DC_input_M = Masking(mask_value=0.0)(DC_input)
 
-#     DC_dense_1 = TimeDistributed(Dense(32))
+#     DC_dense_1 = TimeDistributed(Dense(64, activation='selu', kernel_initializer='lecun_normal'))
 #     DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu')
-#     DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu')
+# #     DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu')
 # #     DC_gru3 = GRU(64, return_sequences=True, return_state=True, activation='selu')
 #     DC_dense_2 = TimeDistributed(Dense(lang.n_words, activation='softmax'))
-#     Ba_output_1 = TimeDistributed(BatchNormalization())
+# #     Ba_output_1 = TimeDistributed(BatchNormalization())
 # #     Ba_output_2 = TimeDistributed(BatchNormalization())
 # #     Ba_output_3 = TimeDistributed(BatchNormalization())
 
 #     DC_output_state1 = EC_output_state
-#     DC_output_state2 = EC_output_state
-#     DC_output_state3 = EC_output_state
+# #     DC_output_state2 = EC_output_state
+# #     DC_output_state3 = EC_output_state
 #     DC_output = DC_input
-#     lst_DC_output = []
-#     for _ in range(lang.max_len_seq) :
-#         DC_output = DC_dense_1(DC_output)
-#         DC_output = Ba_output_1(DC_output)
-#         DC_output, DC_output_state1 = DC_gru1(DC_output, initial_state=DC_output_state1)
-#         DC_output, DC_output_state2 = DC_gru2(DC_output, initial_state=DC_output_state2)
+# #     lst_DC_output = []
+# #     for _ in range(lang.max_len_seq) :
+#     DC_output = DC_dense_1(DC_output)
+# #     DC_output = Ba_output_1(DC_output)
+#     DC_output, DC_output_state1 = DC_gru1(DC_output, initial_state=DC_output_state1)
+# #     DC_output, DC_output_state2 = DC_gru2(DC_output, initial_state=DC_output_state2)
 # #         DC_output = Ba_output_2(DC_output)
 # #         DC_output, DC_output_state3 = DC_gru3(DC_output, initial_state=DC_output_state3)
 # #         DC_output = Ba_output_3(DC_output)
-#         DC_output = DC_dense_2(DC_output)
-#         lst_DC_output += [DC_output]
+#     DC_output = DC_dense_2(DC_output)
+# #     lst_DC_output += [DC_output]
 
-#     DC_output = Lambda(lambda x: K.concatenate(x, axis=1))(lst_DC_output)
+# #     DC_output = Lambda(lambda x: K.concatenate(x, axis=1))(lst_DC_output)
 
 #     model = Model([EC_input,DC_input],DC_output)
 #     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
@@ -458,30 +423,28 @@ def model_pretrain(lang=lang) :
 #     return model
 
 
-# In[31]:
+# In[12]:
 
 
 def model_DC_only1(lang=lang) :
     EC_input = Input(shape=(80,4096))
-#     EC_output = BatchNormalization()(EC_input)
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
-#     EC_output = BatchNormalization()(EC_output)
-#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
-#     EC_output = BatchNormalization()(EC_output)
-    EC_output, EC_output_state = GRU(64,return_state=True, activation='selu', kernel_initializer='lecun_normal')(EC_input)
+    EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_input)
+    EC_output = BatchNormalization()(EC_output)
+    EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
+    EC_output = BatchNormalization()(EC_output)
+    EC_output, EC_output_state = GRU(64,return_state=True, activation='selu')(EC_output)
     EC_output_stage = BatchNormalization()(EC_output_state)
     DC_input = Input(shape=(1,lang.n_words))
 #     DC_input_M = Masking(mask_value=0.0)(DC_input)
 
-    DC_dense_1 = TimeDistributed(Dense(32, activation='selu', kernel_initializer='lecun_normal'))
-    DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu', kernel_initializer='lecun_normal')
-    DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu', kernel_initializer='lecun_normal')
+    DC_dense_1 = TimeDistributed(Dense(32))
+    DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu')
+    DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu')
 #     DC_gru3 = GRU(64, return_sequences=True, return_state=True, activation='selu')
     DC_dense_2 = TimeDistributed(Dense(lang.n_words, activation='softmax'))
-#     Ba_output_1 = TimeDistributed(BatchNormalization())
+    Ba_output_1 = TimeDistributed(BatchNormalization())
 #     Ba_output_2 = TimeDistributed(BatchNormalization())
 #     Ba_output_3 = TimeDistributed(BatchNormalization())
-
 
     DC_output_state1 = EC_output_state
     DC_output_state2 = EC_output_state
@@ -490,7 +453,7 @@ def model_DC_only1(lang=lang) :
     lst_DC_output = []
     for _ in range(lang.max_len_seq) :
         DC_output = DC_dense_1(DC_output)
-#         DC_output = Ba_output_1(DC_output)
+        DC_output = Ba_output_1(DC_output)
         DC_output, DC_output_state1 = DC_gru1(DC_output, initial_state=DC_output_state1)
         DC_output, DC_output_state2 = DC_gru2(DC_output, initial_state=DC_output_state2)
 #         DC_output = Ba_output_2(DC_output)
@@ -507,7 +470,104 @@ def model_DC_only1(lang=lang) :
     return model
 
 
-# In[32]:
+# In[13]:
+
+
+# def model_DC_only1(lang=lang) :
+#     EC_input = Input(shape=(80,4096))
+# #     EC_output = BatchNormalization()(EC_input)
+# #     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_input)
+# #     EC_output = BatchNormalization()(EC_output)
+# #     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
+# #     EC_output = BatchNormalization()(EC_output)
+#     EC_output, EC_output_state = GRU(64,return_state=True, activation='selu', kernel_initializer='lecun_normal')(EC_input)
+#     EC_output_stage = BatchNormalization()(EC_output_state)
+#     DC_input = Input(shape=(1,lang.n_words))
+# #     DC_input_M = Masking(mask_value=0.0)(DC_input)
+
+#     DC_dense_1 = TimeDistributed(Dense(64, activation='selu', kernel_initializer='lecun_normal'))
+#     DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu')
+# #     DC_gru2 = GRU(64, return_sequences=True, return_state=True, activation='selu', kernel_initializer='lecun_normal')
+# #     DC_gru3 = GRU(64, return_sequences=True, return_state=True, activation='selu')
+#     DC_dense_2 = TimeDistributed(Dense(lang.n_words, activation='softmax'))
+# #     Ba_output_1 = TimeDistributed(BatchNormalization())
+# #     Ba_output_2 = TimeDistributed(BatchNormalization())
+# #     Ba_output_3 = TimeDistributed(BatchNormalization())
+
+
+#     DC_output_state1 = EC_output_state
+# #     DC_output_state2 = EC_output_state
+# #     DC_output_state3 = EC_output_state
+#     DC_output = DC_input
+#     lst_DC_output = []
+#     for _ in range(lang.max_len_seq) :
+#         DC_output = DC_dense_1(DC_output)
+# #         DC_output = Ba_output_1(DC_output)
+#         DC_output, DC_output_state1 = DC_gru1(DC_output, initial_state=DC_output_state1)
+# #         DC_output, DC_output_state2 = DC_gru2(DC_output, initial_state=DC_output_state2)
+# #         DC_output = Ba_output_2(DC_output)
+# #         DC_output, DC_output_state3 = DC_gru3(DC_output, initial_state=DC_output_state3)
+# #         DC_output = Ba_output_3(DC_output)
+#         DC_output = DC_dense_2(DC_output)
+#         lst_DC_output += [DC_output]
+
+#     DC_output = Lambda(lambda x: K.concatenate(x, axis=1))(lst_DC_output)
+
+#     model = Model([EC_input,DC_input],DC_output)
+#     model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
+#     print (model.summary())
+#     return model
+
+
+# In[14]:
+
+
+def model_attention(lang=lang) :
+    EC_input = Input(shape=(80,4096))
+#     EC_output = BatchNormalization()(EC_input)
+#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_input)
+#     EC_output = BatchNormalization()(EC_output)
+#     EC_output = Bidirectional(GRU(32,return_state=False, return_sequences=True, activation='selu'), merge_mode='concat')(EC_output)
+#     EC_output = BatchNormalization()(EC_output)
+    EC_output, EC_output_state = GRU(64,return_sequences=True, return_state=True, activation='selu', kernel_initializer='lecun_normal')(EC_input)
+    EC_output_stage = BatchNormalization()(EC_output_state)
+    DC_input = Input(shape=(1,lang.n_words,))
+    DC_input_R = Reshape((lang.n_words,))(DC_input)
+#     DC_input_M = Masking(mask_value=0.0)(DC_input)
+
+    DC_dense_1 = Dense(64, activation='selu', kernel_initializer='lecun_normal')
+    DC_gru1 = GRU(64, return_sequences=True, return_state=True, activation='selu')
+    DC_dense_2 = Dense(lang.n_words, activation='softmax')
+
+    DC_output_state1 = EC_output_state
+#     DC_output_state2 = EC_output_state
+#     DC_output_state3 = EC_output_state
+    DC_output = DC_input_R
+#     print (DC_output)
+    lst_DC_output = []
+#     print (len(EC_output.shape))
+    for _ in range(lang.max_len_seq) :
+        DC_output = Reshape((lang.n_words,))(DC_output)
+        DC_output = DC_dense_1(DC_output)
+        DC_output_RV = RepeatVector(80)(DC_output)
+        EC_output = Multiply()([DC_output_RV,EC_output])
+        DC_output = Lambda(lambda x: K.mean(x,axis=1))(EC_output)
+        DC_output = Reshape((1,64))(DC_output)
+
+        DC_output, DC_output_state1 = DC_gru1(DC_output, initial_state=DC_output_state1)
+
+        DC_output = DC_dense_2(DC_output)
+        lst_DC_output += [DC_output]
+
+    DC_output = Lambda(lambda x: K.concatenate(x, axis=1))(lst_DC_output)
+
+    model = Model([EC_input,DC_input],DC_output)
+    model.compile(optimizer='adam', loss='categorical_crossentropy', metrics=['acc'])
+    print (model.summary())
+    return model
+
+
+# In[15]:
 
 
 def ary_pred_to_df_ans(ary_pred, lst_id_test) :
@@ -520,22 +580,25 @@ def ary_pred_to_df_ans(ary_pred, lst_id_test) :
     return df_ans
 
 
-# In[40]:
+# In[16]:
 
 
 ### main
 # MCP = keras.callbacks.ModelCheckpoint('./model/{}_{}.h5'.format(model_name,k), monitor='val_acc', verbose=0, save_best_only=True, save_weights_only=False, mode='auto', period=1)
-# ES = keras.callbacks.EarlyStopping(monitor='val_acc', min_delta=0, patience=50, verbose=0, mode='auto')
+ES = keras.callbacks.EarlyStopping(monitor='loss', min_delta=0, patience=3, verbose=0, mode='auto')
 
 if teacherForce :
     model = model_pretrain(lang)
 else :
-    model = model_DC_only1(lang)
-    if do_training :
-        ary_temp = np.zeros((len(ary_train_EC_input),1,lang.n_words))
-        ary_temp[:,0,0] = 1
-        ary_train_DC_input = ary_temp
-    
+    if attention :
+        model = model_attention(lang)
+    else :
+        model = model_DC_only1(lang)
+        if do_training :
+            ary_temp = np.zeros((len(ary_train_EC_input),1,lang.n_words))
+            ary_temp[:,0,0] = 1
+            ary_train_DC_input_2 = ary_temp
+
     
 if loading_model :
     print ('loading and seting weight...')
@@ -547,19 +610,23 @@ if loading_model :
             lst_layer_weights = pickle.load(f)
     else :
 #         with open('./weights/lst_layer_weights_noTeacher_special.pkl'.format(i), "rb") as f:
-        with open('./model_weight/lst_layer_weights_2.pkl'.format(i), "rb") as f:
+        with open('./model_weight/{}'.format(load_model_weight_name), "rb") as f:
             lst_layer_weights = pickle.load(f)
     len_model_layer = len(model.layers)
     for i, layer in enumerate(model.layers) :
-        if i >= 7 :
+        if i > 11 :
             break
-        elif i < 4 :
+        elif i < 7 :
             layer.trainable = False
         print (i)
         layer.set_weights(lst_layer_weights[i])
+    print ('loading model_weight finished...')
 
 if do_training :
-    log = model.fit([ary_train_EC_input, ary_train_DC_input],ary_train_DC_output, epochs=10, batch_size=128, validation_split=0., callbacks=[]) 
+    if teacherForce :
+        log = model.fit([ary_train_EC_input, ary_train_DC_input],ary_train_DC_output, epochs=500, batch_size=256, validation_split=0., callbacks=[]) 
+    else :
+        log = model.fit([ary_train_EC_input, ary_train_DC_input_2],ary_train_DC_output, epochs=500, batch_size=256, validation_split=0., callbacks=[]) 
     df_log = log.history
     #fig = keras_log_plot(df_log)
     
@@ -582,7 +649,7 @@ if save_model :
 
 
 
-# In[41]:
+# In[17]:
 
 
 ### prediction
@@ -615,13 +682,24 @@ df_ans.to_csv("./{}".format(str_output), index=False, header=False)
 print ('test : ')
 print (df_ans)
 
+### testing data prediction
+# model_test = model_DC_only1(lang)
+# ary_pred_test = model_test.predict([ary_test_EC_input, ary_test_DC_input])
+ary_pred_test = model.predict([ary_peer_review_EC_input, ary_peer_review_DC_input])
+
+df_ans = ary_pred_to_df_ans(ary_pred_test, lst_id_peer_review)
+df_ans.to_csv("./{}".format(str_output_peer_review), index=False, header=False)
+print ('test : ')
+print (df_ans)
 
 
 
 
 
 
-# In[ ]:
+
+
+# In[18]:
 
 
 # ary_sample_output_testset = np.loadtxt(open(path_data + "sample_output_testset.txt", "rb"), delimiter=",")
