@@ -154,7 +154,7 @@ class Agent_DQN(Agent):
             #you can load your model here
             k = 0
             print('loading trained model')
-            self.saver.restore(self.sess, './model_tf/{}'.format(best_model_name))
+            self.saver.restore(self.sess, './{}'.format(best_model_name))
             print ('loading model finished...')
 
 
