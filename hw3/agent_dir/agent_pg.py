@@ -48,61 +48,61 @@ class Agent_PG(Agent):
             self.action_n = 2
         self.a2c_sep = True
         
-        def build_model():
-            self.x=tf.placeholder(tf.float32,shape=[None,6400])
-            self.v=tf.placeholder(tf.float32,shape=[None])
-            self.a=tf.placeholder(tf.int32,shape=[None])
-            temp = keras.layers.Dense(2048,activation='relu')(self.x)
-            self.a_prob = keras.layers.Dense(self.action_n,activation='softmax')(temp)
-            temp2 = keras.layers.Dense(2048,activation='relu')(self.x)
-            self.v_output = keras.layers.Dense(1,activation='linear')(temp2)
-            self.v_output = tf.reshape(self.v_output,[-1])
-            vloss=tf.reduce_sum(tf.square(self.v-self.v_output))
+#         def build_model():
+#             self.x=tf.placeholder(tf.float32,shape=[None,6400])
+#             self.v=tf.placeholder(tf.float32,shape=[None])
+#             self.a=tf.placeholder(tf.int32,shape=[None])
+#             temp = keras.layers.Dense(2048,activation='relu')(self.x)
+#             self.a_prob = keras.layers.Dense(self.action_n,activation='softmax')(temp)
+#             temp2 = keras.layers.Dense(2048,activation='relu')(self.x)
+#             self.v_output = keras.layers.Dense(1,activation='linear')(temp2)
+#             self.v_output = tf.reshape(self.v_output,[-1])
+#             vloss=tf.reduce_sum(tf.square(self.v-self.v_output))
             
-            CE = tf.reduce_sum(-tf.log(self.a_prob)*tf.one_hot(self.a, self.action_n), axis=1)
-            self.obj = tf.reduce_sum(CE * self.v) 
+#             CE = tf.reduce_sum(-tf.log(self.a_prob)*tf.one_hot(self.a, self.action_n), axis=1)
+#             self.obj = tf.reduce_sum(CE * self.v) 
 
-            self.v_train_op = tf.train.AdamOptimizer(self.lr).minimize(vloss)
-            self.train_step = tf.train.AdamOptimizer(self.lr).minimize(self.obj)
-#         def build_model() :
-#             self.input_s = tf.placeholder(tf.float32, shape=(None, 80, 80, 1))
-#             self.input_a = tf.placeholder(tf.int32, shape=(None,))
-#             self.input_R = tf.placeholder(tf.float32, shape=(None,1))
+#             self.v_train_op = tf.train.AdamOptimizer(self.lr).minimize(vloss)
+#             self.train_step = tf.train.AdamOptimizer(self.lr).minimize(self.obj)
+        def build_model() :
+            self.input_s = tf.placeholder(tf.float32, shape=(None, 80, 80, 1))
+            self.input_a = tf.placeholder(tf.int32, shape=(None,))
+            self.input_R = tf.placeholder(tf.float32, shape=(None,1))
             
-#             with tf.variable_scope('pg') :
-# #                 c = keras.layers.Conv2D(16, (8,8), strides=(4,4), activation='relu')(self.input_s)
-# #                 c = keras.layers.Conv2D(32, (4,4), strides=(2,2), activation='relu')(c)
-# #                 c = keras.layers.Flatten()(c)
-# #                 c = keras.layers.Dense(128, activation='elu')(c)
-#                 c = keras.layers.Flatten()(self.input_s)
-#                 c = keras.layers.Dense(2048, activation='relu')(c)
-#                 self.a_prob = keras.layers.Dense(self.action_n, activation='softmax')(c)
+            with tf.variable_scope('pg') :
+#                 c = keras.layers.Conv2D(16, (8,8), strides=(4,4), activation='relu')(self.input_s)
+#                 c = keras.layers.Conv2D(32, (4,4), strides=(2,2), activation='relu')(c)
+#                 c = keras.layers.Flatten()(c)
+#                 c = keras.layers.Dense(128, activation='elu')(c)
+                c = keras.layers.Flatten()(self.input_s)
+                c = keras.layers.Dense(2048, activation='relu')(c)
+                self.a_prob = keras.layers.Dense(self.action_n, activation='softmax')(c)
     
-#                 # a2c
-#                 c2 = c
-#                 if self.a2c_sep :
-# #                     c2 = keras.layers.Conv2D(16, (8,8), strides=(4,4), activation='relu')(self.input_s)
-# #                     c2 = keras.layers.Conv2D(32, (4,4), strides=(2,2), activation='relu')(c2)
-# #                     c2 = keras.layers.Flatten()(c2)
-# #                     c2 = keras.layers.Dense(128, activation='elu')(c2)
-#                     c2 = keras.layers.Flatten()(self.input_s)
-#                     c2 = keras.layers.Dense(2048, activation='relu')(c2)
-#                 self.v = keras.layers.Dense(1, activation='linear')(c2)
-#                 self.v_loss = tf.reduce_sum(tf.square(self.input_R-self.v))
-#                 self.v_train_op = tf.train.RMSPropOptimizer(self.lr, decay=0.9).minimize(self.v_loss)
+                # a2c
+                c2 = c
+                if self.a2c_sep :
+#                     c2 = keras.layers.Conv2D(16, (8,8), strides=(4,4), activation='relu')(self.input_s)
+#                     c2 = keras.layers.Conv2D(32, (4,4), strides=(2,2), activation='relu')(c2)
+#                     c2 = keras.layers.Flatten()(c2)
+#                     c2 = keras.layers.Dense(128, activation='elu')(c2)
+                    c2 = keras.layers.Flatten()(self.input_s)
+                    c2 = keras.layers.Dense(2048, activation='relu')(c2)
+                self.v = keras.layers.Dense(1, activation='linear')(c2)
+                self.v_loss = tf.reduce_sum(tf.square(self.input_R-self.v))
+                self.v_train_op = tf.train.RMSPropOptimizer(self.lr, decay=0.9).minimize(self.v_loss)
                 
-# #                 tf_mean, tf_variance= tf.nn.moments(self.input_R, [0], shift=None, name="reward_moments")
-# #                 tf_temp = (self.input_R - tf_mean) / tf.sqrt(tf_variance + 1e-6)
-# #                 tf_temp = (self.input_R - tf_mean - 0.2)
+#                 tf_mean, tf_variance= tf.nn.moments(self.input_R, [0], shift=None, name="reward_moments")
+#                 tf_temp = (self.input_R - tf_mean) / tf.sqrt(tf_variance + 1e-6)
+#                 tf_temp = (self.input_R - tf_mean - 0.2)
                 
-# #                 a = tf.one_hot(self.input_a, self.action_n)
-#                 C_E = -tf.reduce_sum(tf.log(self.a_prob)*tf.one_hot(self.input_a, self.action_n), axis=1, keep_dims=True)
+#                 a = tf.one_hot(self.input_a, self.action_n)
+                C_E = -tf.reduce_sum(tf.log(self.a_prob)*tf.one_hot(self.input_a, self.action_n), axis=1, keep_dims=True)
 
-# #                 C_E = tf.multiply(C_E,tf_temp)
-#                 C_E = tf.multiply(C_E,(self.input_R - self.v))
-#                 self.obj = tf.reduce_sum(C_E)
-# #                 self.obj = tf.multiply(s,self.input_R)
-#                 self.train_step = tf.train.RMSPropOptimizer(self.lr, decay=0.9).minimize(self.obj)
+#                 C_E = tf.multiply(C_E,tf_temp)
+                C_E = tf.multiply(C_E,(self.input_R - self.v))
+                self.obj = tf.reduce_sum(C_E)
+#                 self.obj = tf.multiply(s,self.input_R)
+                self.train_step = tf.train.RMSPropOptimizer(self.lr, decay=0.9).minimize(self.obj)
                 
             
             self.sess = tf.Session(config=config)
@@ -116,7 +116,7 @@ class Agent_PG(Agent):
             #you can load your model here
             print('loading trained model')
 #             self.saver.restore(self.sess, './model_tf/model_pg_elu.ckpt')
-            self.saver.restore(self.sess, './model_tf/model_pg_no_meanstd_a2c_sep_0.ckpt')
+            self.saver.restore(self.sess, './model_pg_elu_lr00025_2a_tanh_0.ckpt')
             print ('loading model finished...')
 
         ##################
