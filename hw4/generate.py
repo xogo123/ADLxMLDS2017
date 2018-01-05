@@ -334,7 +334,7 @@ def text_pre(text) :
     return hair_style, eyes_style
 
 
-# In[42]:
+# In[48]:
 
 
 def generate_img(testing_text_id,img_n=40,hair_style='null',eyes_style='null', gan=None) :
@@ -381,11 +381,11 @@ def generate_img(testing_text_id,img_n=40,hair_style='null',eyes_style='null', g
         os.makedirs('./samples')
     
     if testing_text_id == '1' :
-        lst_img = b_img[[4,8,10,15,21]]
+        lst_img = b_img[[3,8,10,11,16]]
         for i,img in enumerate(lst_img) :
             scipy.misc.imsave('./samples/sample_{}_{}.jpg'.format(int(testing_text_id),i+1),img)
     if testing_text_id == '2' :
-        lst_img = b_img[[7,20,22,29,32]]
+        lst_img = b_img[[7,13,14,29,32]]
         for i,img in enumerate(lst_img) :
             scipy.misc.imsave('./samples/sample_{}_{}.jpg'.format(int(testing_text_id),i+1),img)
 
@@ -398,7 +398,7 @@ def generate_img(testing_text_id,img_n=40,hair_style='null',eyes_style='null', g
 #         scipy.misc.imsave('./samples/sample_{}_{}.jpg'.format(int(testing_text_id),i+1),img)
 
 
-# In[43]:
+# In[50]:
 
 
 print (text_path)
